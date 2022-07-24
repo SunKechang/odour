@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjfu.li.odour.mapper.OilMapper">
+
+    <resultMap id="OilRiMap" type="com.bjfu.li.odour.po.Oil">
+        <id column="id" property="id"/>
+        <result column="oil_name" property="oilName" />
+        <result column="oil_type" property="oilType"/>
+        <result column="oil_brand" property="oilBrand"/>
+        <result column="oil_date" property="oilDate"/>
+
+
+        <collection property="okList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.OilKey">
+            <id column="okrid" property="id"/>
+            <result column="ok_keycompound_name" property="keycompoundName" />
+            <result column="ok_cas_no" property="casNo"/>
+            <result column="ok_concentration" property="concentration"/>
+            <result column="ok_ok_note" property="okNote"/>
+            <result column="ok_oil_id" property="oilId"/>
+        </collection>
+
+        <collection property="ooList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.OilOdour">
+            <id column="oorid" property="id"/>
+            <result column="oo_oil_odour" property="oilOdour"/>
+            <result column="oo_oil_odour_intensity" property="oilOdourIntensity"/>
+            <result column="oo_oo_note" property="ooNote"/>
+            <result column="oo_oil_id" property="oilId"/>
+        </collection>
+
+
+
+    </resultMap>
+
+    <select id="selectAll" resultMap="OilRiMap">
+        select c.*,
+               ok.id as okrid,ok.keycompound_name as ok_keycompound_name,ok.cas_no as ok_cas_no,ok.concentration as ok_concentration,ok.ok_note as ok_ok_note,ok.oil_id as ok_oil_id,
+               oo.id as oorid,
+               oo.oil_odour as oo_oil_odour,
+               oo.oil_odour_intensity as oo_oil_odour_intensity,
+               oo.oo_note as oo_oo_note,
+               oo.oil_id as oo_oil_id
+
+        from oil as c,oil_key as ok,oil_odour as oo
+        where c.id=ok.oil_id
+          and c.id=oo.oil_id
+    </select>
+
+    <select id="selectByOilName" resultMap="OilRiMap">
+        select c.*,
+               ok.id as okrid,ok.keycompound_name as ok_keycompound_name,ok.cas_no as ok_cas_no,ok.concentration as ok_concentration,ok.ok_note as ok_ok_note,ok.oil_id as ok_oil_id,
+               oo.id as oorid,oo.oil_odour as oo_oil_odour,oo.oil_odour_intensity as oo_oil_odour_intensity,oo.oo_note as oo_oo_note,oo.oil_id as oo_oil_id
+
+        from oil as c,oil_key as ok,oil_odour as oo
+        where c.id=ok.oil_id
+          and c.id=oo.oil_id
+        and (oil_name like "%"#{name}"%" )
+    </select>
+
+    <select id="selectByOilType" resultMap="OilRiMap">
+        select c.*,
+               ok.id as okrid,ok.keycompound_name as ok_keycompound_name,ok.cas_no as ok_cas_no,ok.concentration as ok_concentration,ok.ok_note as ok_ok_note,ok.oil_id as ok_oil_id,
+               oo.id as oorid,oo.oil_odour as oo_oil_odour,oo.oil_odour_intensity as oo_oil_odour_intensity,oo.oo_note as oo_oo_note,oo.oil_id as oo_oil_id
+
+        from oil as c,oil_key as ok,oil_odour as oo
+        where c.id=ok.oil_id
+          and c.id=oo.oil_id
+        and (oil_type like "%"#{type}"%" )
+    </select>
+
+    <select id="selectByOilBrand" resultMap="OilRiMap">
+        select c.*,
+            ok.id as okrid,ok.keycompound_name as ok_keycompound_name,ok.cas_no as ok_cas_no,ok.concentration as ok_concentration,ok.ok_note as ok_ok_note,ok.oil_id as ok_oil_id,
+            oo.id as oorid,oo.oil_odour as oo_oil_odour,oo.oil_odour_intensity as oo_oil_odour_intensity,oo.oo_note as oo_oo_note,oo.oil_id as oo_oil_id
+
+        from oil as c,oil_key as ok,oil_odour as oo
+        where c.id=ok.oil_id
+          and c.id=oo.oil_id
+        and (oil_brand like "%"#{brand}"%" )
+    </select>
+
+    <select id="selectByCas" resultMap="OilRiMap">
+        select c.*,
+            ok.id as okrid,ok.keycompound_name as ok_keycompound_name,ok.cas_no as ok_cas_no,ok.concentration as ok_concentration,ok.ok_note as ok_ok_note,ok.oil_id as ok_oil_id,
+            oo.id as oorid,oo.oil_odour as oo_oil_odour,oo.oil_odour_intensity as oo_oil_odour_intensity,oo.oo_note as oo_oo_note,oo.oil_id as oo_oil_id
+
+        from oil as c,oil_key as ok,oil_odour as oo
+        where c.id=ok.oil_id
+          and c.id=oo.oil_id
+        and c.id in (
+            select oil_key.oil_id
+            from oil_key
+            where (oil_key.cas_no = #{cas} )
+        )
+    </select>
+    <select id="selectByOilOdour" resultMap="OilRiMap">
+        select c.*,
+            ok.id as okrid,ok.keycompound_name as ok_keycompound_name,ok.cas_no as ok_cas_no,ok.concentration as ok_concentration,ok.ok_note as ok_ok_note,ok.oil_id as ok_oil_id,
+            oo.id as oorid,oo.oil_odour as oo_oil_odour,oo.oil_odour_intensity as oo_oil_odour_intensity,oo.oo_note as oo_oo_note,oo.oil_id as oo_oil_id
+
+
+        from oil as c,oil_key as ok,oil_odour as oo
+        where c.id=ok.oil_id
+          and c.id=oo.oil_id
+        and c.id in (
+            select oil_odour.oil_id
+            from oil_odour
+            where (oil_odour.oil_odour like "%"#{description}"%" )
+        )
+    </select>
+
+
+
+</mapper>

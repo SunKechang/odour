@@ -1,0 +1,29 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/odour?characterEncoding=utf-8&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  main:
+    allow-bean-definition-overriding: true
+#  resources:
+#    static-locations: classpath:/templates/,classpath:/static/img/
+#  mvc:
+#    static-path-pattern: /**
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: is_deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+#localImgPath: /usr/share/nginx/resource/
+#networkImgPath: resource/
+localImgPath: C:\Users\Administrator\Desktop\xzz\bishe\code\odour\target\classes\static\
+networkImgPath: /static/
+rawFileDir: C:/Users/li/Desktop/nginx/resource/download/
+teamNewsDir: C:/Users/li/Desktop/nginx/resource/static/news/
