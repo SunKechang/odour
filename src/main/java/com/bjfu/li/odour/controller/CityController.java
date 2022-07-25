@@ -39,8 +39,8 @@ public class CityController {
 
     @GetMapping("/total")
     public SverResponse<String> getTotalNumbers(){
-        int total=cityService.count();
-        return SverResponse.createRespBySuccess(Integer.toString(total));
+        long total=cityService.count();
+        return SverResponse.createRespBySuccess(Long.toString(total));
     }
 
 }

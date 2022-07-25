@@ -45,7 +45,7 @@ public class CodeGenerator {
         gc.setOutputDir(projectPath + "/src/main/java");
         gc.setAuthor("li");
         gc.setOpen(false);
-        // gc.setSwagger2(true); 实体属性 Swagger2 注解
+        // gc.setSwagger2(true); 实体属性 Swagger2 注解C
         mpg.setGlobalConfig(gc);
 
         // 数据源配置
@@ -54,7 +54,7 @@ public class CodeGenerator {
         // dsc.setSchemaName("public");
         dsc.setDriverName("com.mysql.cj.jdbc.Driver");
         dsc.setUsername("root");
-        dsc.setPassword("123456");
+        dsc.setPassword("1999331");
         mpg.setDataSource(dsc);
 
         // 包配置

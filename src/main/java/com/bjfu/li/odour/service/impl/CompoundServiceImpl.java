@@ -2,13 +2,7 @@ package com.bjfu.li.odour.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bjfu.li.odour.mapper.*;
-import com.bjfu.li.odour.po.Measured;
-import com.bjfu.li.odour.po.LowMeasured;
-import com.bjfu.li.odour.po.Compound;
-import com.bjfu.li.odour.po.Ri;
-import com.bjfu.li.odour.po.Nri;
-import com.bjfu.li.odour.po.OdourDescription;
-import com.bjfu.li.odour.po.OdourThreshold;
+import com.bjfu.li.odour.po.*;
 import com.bjfu.li.odour.service.ICompoundService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bjfu.li.odour.utils.Base64Utils;
@@ -21,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -53,6 +48,12 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
 
     @Resource
     LowMeasuredMapper lowmeasuredMapper;
+    @Resource
+    ProductKeyMapper productKeyMapper;
+    @Resource
+    ProductOdourThresholdMapper productOtMapper;
+    @Resource
+    ProductOdourDescriptionMapper productOdMapper;
 
 
 
@@ -68,7 +69,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             case "compound_name":
                 return compoundMapper.selectByCompoundName(propertyDescription);
             case "odour_description":
-                String description = new String(propertyDescription);
+                String description = propertyDescription;
                 return   compoundMapper.selectByOdourDescription(description);
             case "odour_threshold":
                 int odourThreshold= Integer.parseInt(propertyDescription);
@@ -150,7 +151,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
 
                 QueryWrapper<Measured> mrQueryWrapper=new QueryWrapper<>();
                 mrQueryWrapper.eq("compound_id",c.getId());
-                c.setMrList(measuredMapper.selectList(mrQueryWrapper));;
+                c.setMrList(measuredMapper.selectList(mrQueryWrapper));
             }
             return compounds;
         }
@@ -211,7 +212,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             else{
                 int validNum=0;
                 for(OdourDescription odourDescription:compound.getOdList()){
-                    if(odourDescription.getOdourDescription()==null||odourDescription.getOdourDescription()=="")
+                    if(odourDescription.getOdourDescription()==null|| Objects.equals(odourDescription.getOdourDescription(), ""))
                         continue;
                     validNum++;
                     odourDescription.setCompoundId(compound.getId());
@@ -307,6 +308,28 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 }
                 if(validNum==0)
                     lowmeasuredMapper.insert(new LowMeasured(null,null,null,compound.getId()));
+            }
+            // 保存产品信息
+            if (compound.getProductList().size() != 0) {
+                for (Product product:compound.getProductList()) {
+                    // Product 和 Compound 对应关系
+                    ProductKey productKey = new ProductKey();
+                    productKey.setProductId(product.getId());
+                    productKey.setCompoundId(compound.getId());
+                    // Product 风味阈值
+                    List<ProductOdourThreshold> productOtList = product.getOtList();
+                    for (ProductOdourThreshold productOt: productOtList) {
+                        productOt.setCompoundId(compound.getId());
+                        productOtMapper.insert(productOt);
+                    }
+                    List<ProductOdourDescription> productOdList = product.getOdList();
+                    for (ProductOdourDescription productOd: productOdList) {
+                        productOd.setCompoundId(compound.getId());
+                        productOdMapper.insert(productOd);
+                    }
+                    // Product 风味描述
+                    productKeyMapper.insert(productKey);
+                }
             }
             return true;
         }catch (Exception e){
@@ -559,13 +582,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             QueryWrapper<OdourThreshold> otQueryWrapper=new QueryWrapper<>();
             otQueryWrapper.eq("compound_id",id);
             otMapper.delete(otQueryWrapper);
-
-
-
             compoundMapper.deleteById(id);
-
-
-
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -574,17 +591,9 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
 
     }
 
-
-//    @Override
-//    public List<Compound> list(){
-//
-//        return compoundMapper.selectAll();
-//    }
-
     @Override
     public List<Compound> list(){
-        List<Compound> res= compoundMapper.selectAll();
-        return res;
+        return compoundMapper.selectAll();
     }
     @Override
     public List<Compound> getNews() {

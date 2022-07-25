@@ -7,31 +7,26 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-
 /**
- * 香气阈值
+ * 关系表
  */
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class OdourThreshold implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
+public class ProductKey {
+    /**
+     * 自增长id
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-
-    private BigDecimal odourThreshold;
-
-    private String odourBase;
-
-    private String odourThresholdReference;
-
+    /**
+     * 化合物 Id
+     */
     private Integer compoundId;
-
+    /**
+     * 产品 Id
+     */
+    private Integer productId;
 
 }

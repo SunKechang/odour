@@ -1,12 +1,7 @@
 package com.bjfu.li.odour.mapper;
 
-import com.baomidou.mybatisplus.extension.api.R;
-import com.bjfu.li.odour.po.Nri;
-import com.bjfu.li.odour.po.Ri;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import com.bjfu.li.odour.po.Ri;
 
 /**
  * <p>

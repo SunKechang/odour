@@ -3,20 +3,16 @@ package com.bjfu.li.odour.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.bjfu.li.odour.common.pojo.SverResponse;
 import com.bjfu.li.odour.common.token.JWTUtils;
-import com.bjfu.li.odour.mapper.NriMapper;
 import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.po.Log;
-import com.bjfu.li.odour.po.Measured;
 import com.bjfu.li.odour.po.LowMeasured;
-import com.bjfu.li.odour.po.Nri;
-import com.bjfu.li.odour.service.INriService;
+import com.bjfu.li.odour.po.Measured;
 import com.bjfu.li.odour.service.impl.CompoundServiceImpl;
 import com.bjfu.li.odour.service.impl.LogServiceImpl;
 import com.bjfu.li.odour.utils.Excel;
-import com.bjfu.li.odour.utils.ProExcel;
 import com.bjfu.li.odour.utils.ExcelUtils;
+import com.bjfu.li.odour.utils.ProExcel;
 import com.bjfu.li.odour.vo.NewsVo;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,8 +45,6 @@ public class CompoundController {
     @Resource
     LogServiceImpl logService;
 
-    @Resource
-    NriMapper nri;
 
     /**
      *
@@ -128,7 +122,6 @@ public class CompoundController {
     @PostMapping("/add")
     public SverResponse<String> addCompound(@RequestBody Compound compound, HttpServletRequest request){
         System.out.println(compound.getChemicalStructure());
-        System.out.println(compound.getChemicalStructure());
         if(compoundService.save(compound)) {
             String token= request.getHeader("Authorization");
             DecodedJWT verify=JWTUtils.verify(token);
@@ -190,12 +183,7 @@ public class CompoundController {
      */
     @GetMapping("/all")
     public SverResponse<List<Compound>> getCompounds(){
-        List<Compound> compounds=compoundService.list();
-        for (Compound c:compounds){
-            System.out.println("---- ");
-
-        }
-
+        List<Compound> compounds = compoundService.list();
         return SverResponse.createRespBySuccess(compounds);
     }
 

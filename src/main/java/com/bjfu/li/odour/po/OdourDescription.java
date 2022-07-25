@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-
+/**
+ * 香气描述
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

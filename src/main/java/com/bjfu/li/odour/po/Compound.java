@@ -1,37 +1,51 @@
 package com.bjfu.li.odour.po;
 
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * 化合物
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class Compound implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    /**
+     * Id
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-
+    /**
+     * 化合物名称
+     */
     private String compoundName;
-
+    /**
+     * 俗名
+     */
     private String synonym;
-
+    /**
+     * CAS号
+     */
     private String casNo;
-
+    /**
+     * 分子结构图
+     */
     private String chemicalStructure;
+    /**
+     * 质谱
+     */
     private String massSpectrogram;
     private String massSpectrogramNist;
-
 
     @TableField(exist = false)
     private List<OdourDescription> odList;
@@ -60,5 +74,19 @@ public class Compound implements Serializable {
 
     @TableLogic
     private Integer isDeleted;
-
+    /**
+     * 上传人
+     */
+    @TableField("uploader")
+    private String uploader;
+    /**
+     * 审核人
+     */
+    @TableField("reviewer")
+    private String reviewer;
+    /**
+     * 包含此化合物的产品
+     */
+    @TableField(exist = false)
+    private List<Product> productList;
 }
