@@ -27,9 +27,7 @@
         <collection property="nriList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.Nri">
             <id column="nrid" property="id"/>
             <result column="compound_nri" property="compoundNri"/>
-            <!--    <result column="chromatographic_column" property="chromatographicColumn"/>-->
             <result column="nri_chromatographic_column" property="chromatographicColumn"/>
-            <!--    <result column="compound_id" property="compoundId"/>-->
             <result column="nri_resource" property="nriResource"/>
             <result column="nri_compound_id" property="compoundId"/>
         </collection>
@@ -218,24 +216,7 @@
 
 
     <select id="selectAll" resultMap="CompoundRiMap">
-        select c.*,
-               ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-
-               nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
---        odour_threshold.id as otrid,odour_threshold.odour_threshold,odour_threshold.odour_threshold_reference,odour_threshold.odour_base,odour_threshold.compound_id as ot_compound_id,
-               ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
---                odour_description.id as odrid,odour_description.odour_description,odour_description.odour_description_reference,odour_description.compound_id as od_compound_id,
-               od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-               measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-               low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
--- from compound as c,ri,measured,nri,low_measured,odour_description,odour_threshold
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
+        select * from compound
     </select>
 
     <select id="selectByCompoundName" resultMap="CompoundRiMap">

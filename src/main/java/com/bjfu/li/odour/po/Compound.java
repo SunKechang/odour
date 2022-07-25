@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,13 +68,13 @@ public class Compound implements Serializable {
     private List<LowMeasured> lowmrList;
 
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
+    private LocalDateTime createTime = LocalDateTime.now();
 
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
     @TableLogic
-    private Integer isDeleted;
+    private Integer isDeleted=0;
     /**
      * 上传人
      */

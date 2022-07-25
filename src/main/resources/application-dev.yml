@@ -7,8 +7,10 @@ spring:
     username: root
     password: 1999331
     driver-class-name: com.mysql.cj.jdbc.Driver
-  main:
-    allow-bean-definition-overriding: true
+
+logging:
+  level:
+   com.bjfu.li.odour.mapper : debug
 #  resources:
 #    static-locations: classpath:/templates/,classpath:/static/img/
 #  mvc:
@@ -23,7 +25,14 @@ mybatis-plus:
 
 #localImgPath: /usr/share/nginx/resource/
 #networkImgPath: resource/
-localImgPath: C:\Users\Administrator\Desktop\xzz\bishe\code\odour\target\classes\static\
+localImgPath: E:\GitHub\Beijing Forestry University\odour\src\main\resources\static\
 networkImgPath: /static/
 rawFileDir: C:/Users/li/Desktop/nginx/resource/download/
 teamNewsDir: C:/Users/li/Desktop/nginx/resource/static/news/
+
+# pagehelper
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql

@@ -1,21 +1,26 @@
 package com.bjfu.li.odour.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bjfu.li.odour.mapper.*;
 import com.bjfu.li.odour.po.*;
 import com.bjfu.li.odour.service.ICompoundService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bjfu.li.odour.utils.Base64Utils;
+import com.bjfu.li.odour.utils.PageResult;
+import com.bjfu.li.odour.utils.PageUtil;
+import com.bjfu.li.odour.vo.CompoundVo;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * <p>
@@ -165,21 +170,16 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
 
     @Override
     public boolean save(Compound compound) {
-        String chemicalStructure=compound.getChemicalStructure();
-        String massSpectrogram=compound.getMassSpectrogram();
-        String massSpectrogramNist=compound.getMassSpectrogramNist();
-
+        String chemicalStructure = compound.getChemicalStructure();
+        String massSpectrogram = compound.getMassSpectrogram();
+        String massSpectrogramNist = compound.getMassSpectrogramNist();
         try {
-//            存图片
-            if(chemicalStructure!=null&&!chemicalStructure.equals("")) {
-                chemicalStructure = networkImgPath+"chemical structure/" + Base64Utils.generateImage(chemicalStructure, localImgPath+"chemical structure");
+            // 存图片
+            if(chemicalStructure != null && !chemicalStructure.equals("")) {
+                chemicalStructure = networkImgPath + "chemical structure/" + Base64Utils.generateImage(chemicalStructure, localImgPath+"chemical structure");
                 compound.setChemicalStructure(chemicalStructure);
             }
-//            if(chemicalStructure!=null&&!chemicalStructure.equals("")) {
-//                chemicalStructure = networkImgPath+"img/" + Base64Utils.generateImage(chemicalStructure, localImgPath+"img");
-//                compound.setChemicalStructure(chemicalStructure);
-//            }
-            if(massSpectrogram!=null&&!massSpectrogram.equals("")) {
+            if(massSpectrogram != null &&! massSpectrogram.equals("")) {
                 massSpectrogram = networkImgPath+"Orbitrap-MS mass spectrometry/" + Base64Utils.generateImage(massSpectrogram, localImgPath+"Orbitrap-MS mass spectrometry");
                 compound.setMassSpectrogram(massSpectrogram);
             }
@@ -187,129 +187,39 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 massSpectrogramNist = networkImgPath+"Low-resolution mass spectrometry/" + Base64Utils.generateImage(massSpectrogramNist, localImgPath+"Low-resolution mass spectrometry");
                 compound.setMassSpectrogramNist(massSpectrogramNist);
             }
-
-//            if(chemicalStructure!=null&&!chemicalStructure.equals("")) {
-//                chemicalStructure = networkImgPath+ Base64Utils.generateImage(chemicalStructure, localImgPath+"chemical structure");
-//                compound.setChemicalStructure(chemicalStructure);
-//            }
-//            if(massSpectrogram!=null&&!massSpectrogram.equals("")) {
-//                massSpectrogram = networkImgPath + Base64Utils.generateImage(massSpectrogram, localImgPath+"Orbitrap-MS mass spectrometry");
-//                compound.setMassSpectrogram(massSpectrogram);
-//            }
-//            if(massSpectrogramNist!=null&&!massSpectrogramNist.equals("")) {
-//                massSpectrogramNist = networkImgPath + Base64Utils.generateImage(massSpectrogramNist, localImgPath+"Low-resolution mass spectrometry");
-//                compound.setMassSpectrogramNist(massSpectrogramNist);
-//            }
-
-            compound.setCreateTime(LocalDateTime.now());
-            compound.setUpdateTime(LocalDateTime.now());
-            compound.setIsDeleted(0);
             compoundMapper.insert(compound);
-
             //风味描述
-            if(compound.getOdList().size()==0)
-                odMapper.insert(new OdourDescription(null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(OdourDescription odourDescription:compound.getOdList()){
-                    if(odourDescription.getOdourDescription()==null|| Objects.equals(odourDescription.getOdourDescription(), ""))
-                        continue;
-                    validNum++;
-                    odourDescription.setCompoundId(compound.getId());
-                    odMapper.insert(odourDescription);
-                }
-                if(validNum==0)
-                    odMapper.insert(new OdourDescription(null,null,null,compound.getId()));
+            for(OdourDescription odourDescription:compound.getOdList()){
+                odourDescription.setCompoundId(compound.getId());
+                odMapper.insert(odourDescription);
+            }
+            //风味阈值
+            for(OdourThreshold odourThreshold:compound.getOtList()){
+                odourThreshold.setCompoundId(compound.getId());
+                otMapper.insert(odourThreshold);
+            }
+            // RI
+            for(Ri ri:compound.getRiList()){
+                ri.setCompoundId(compound.getId());
+                riMapper.insert(ri);
+            }
+            // NRI
+            for(Nri nri:compound.getNriList()){
+                nri.setCompoundId(compound.getId());
+                nriMapper.insert(nri);
             }
 
-//            //风味阈值
-            if(compound.getOtList().size()==0)
-                otMapper.insert(new OdourThreshold(null,null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(OdourThreshold odourThreshold:compound.getOtList()){
-                    if(odourThreshold.getOdourThreshold().doubleValue()==0&& odourThreshold.getOdourBase()==null&& odourThreshold.getOdourThresholdReference()==null)
-                        continue;
-                    if(odourThreshold.getOdourThreshold()==null|| odourThreshold.getOdourThreshold().intValue()==0)
-                        continue;
-                    validNum++;
-                    odourThreshold.setCompoundId(compound.getId());
-                    otMapper.insert(odourThreshold);
-                }
-                if(validNum==0)
-                    otMapper.insert(new OdourThreshold(null,null,null,null,compound.getId()));
+            // 离子碎片和相对丰度
+            for(Measured measured :compound.getMrList()){
+                measured.setCompoundId(compound.getId());
+                measuredMapper.insert(measured);
             }
-
-
-            //必须放在插入之后再处理RI，因为Compound还没插入没有主键
-            if(compound.getRiList().size()==0)
-                riMapper.insert(new Ri(null,null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(Ri ri:compound.getRiList()){
-                    if(ri.getCompoundRi()==null||ri.getCompoundRi()==0)
-                        continue;
-                    validNum++;
-                    ri.setCompoundId(compound.getId());
-                    riMapper.insert(ri);
-                }
-                if(validNum==0)
-                    riMapper.insert(new Ri(null,null,null,null,compound.getId()));
-            }
-
-            //NRI
-            if(compound.getNriList().size()==0)
-                nriMapper.insert(new Nri(null,null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(Nri nri:compound.getNriList()){
-                    if(nri.getCompoundNri()==null||nri.getCompoundNri()==0)
-                        continue;
-                    validNum++;
-                    nri.setCompoundId(compound.getId());
-                    nriMapper.insert(nri);
-                }
-                if(validNum==0)
-                    nriMapper.insert(new Nri(null,null,null,null,compound.getId()));
-            }
-
-            //离子碎片和相对丰度
-            if(compound.getMrList().size()==0)
-                measuredMapper.insert(new Measured(null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(Measured measured :compound.getMrList()){
-                    if(measured.getMeasured().doubleValue()==0&& measured.getRelativeAbundance()==0)
-                        continue;
-                    if((measured.getMeasured()==null|| measured.getMeasured().intValue()==0)||(measured.getRelativeAbundance()==null|| measured.getRelativeAbundance()==0))
-                        continue;
-                    validNum++;
-                    measured.setCompoundId(compound.getId());
-                    measuredMapper.insert(measured);
-                }
-                if(validNum==0)
-                    measuredMapper.insert(new Measured(null,null,null,compound.getId()));
-            }
-
-
             //低精度离子碎片和相对丰度
-            if(compound.getLowmrList().size()==0)
-                lowmeasuredMapper.insert(new LowMeasured(null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(LowMeasured lowMeasured :compound.getLowmrList()){
-                    if(lowMeasured.getMeasured().doubleValue()==0&& lowMeasured.getRelativeAbundance()==0)
-                        continue;
-                    if((lowMeasured.getMeasured()==null|| lowMeasured.getMeasured().intValue()==0)||( lowMeasured.getRelativeAbundance()==null|| lowMeasured.getRelativeAbundance()==0))
-                        continue;
-                    validNum++;
-                    lowMeasured.setCompoundId(compound.getId());
-                    lowmeasuredMapper.insert(lowMeasured);
-                }
-                if(validNum==0)
-                    lowmeasuredMapper.insert(new LowMeasured(null,null,null,compound.getId()));
+            for(LowMeasured lowMeasured :compound.getLowmrList()){
+                lowMeasured.setCompoundId(compound.getId());
+                lowmeasuredMapper.insert(lowMeasured);
             }
-            // 保存产品信息
+            // 产品
             if (compound.getProductList().size() != 0) {
                 for (Product product:compound.getProductList()) {
                     // Product 和 Compound 对应关系
@@ -337,34 +247,15 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             return false;
         }
     }
-
     @Override
     public boolean updateById(Compound compound) {
-        String chemicalStructure=compound.getChemicalStructure();
-        String massSpectrogram=compound.getMassSpectrogram();
-        String massSpectrogramNist=compound.getMassSpectrogramNist();
-        Compound _compound=null;
+        String chemicalStructure = compound.getChemicalStructure();
+        String massSpectrogram = compound.getMassSpectrogram();
+        String massSpectrogramNist = compound.getMassSpectrogramNist();
+        Compound _compound= new Compound();
         if(chemicalStructure.startsWith("data")||massSpectrogram.startsWith("data"))
-            _compound=compoundMapper.selectById(compound.getId());
-
+            _compound = compoundMapper.selectById(compound.getId());
         try {
-            if(compound.getCasNo()==null)
-                compound.setCasNo(null);
-//            compoundMapper.updateById(compound);
-
-            if(compound.getSynonym()==null)
-                compound.setSynonym(null);
-//            compoundMapper.updateById(compound);
-
-            if(compound.getCompoundName()==null)
-                compound.setCompoundName(null);
-//            compoundMapper.updateById(compound);
-
-
-
-
-
-
             if(!chemicalStructure.equals("")) {
                 //不是base64就说明没有更新
                 if(chemicalStructure.startsWith("data")&&_compound!=null){
@@ -404,130 +295,59 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                     compound.setMassSpectrogramNist(massSpectrogramNist);
                 }
             }
-
             compoundMapper.updateById(compound);
 
-
-
-//更新ri
+            // 更新ri
             QueryWrapper<Ri> riQueryWrapper=new QueryWrapper<>();
             riQueryWrapper.eq("compound_id",compound.getId());
             riMapper.delete(riQueryWrapper);
-
-            if(compound.getRiList().size()==0)
-                riMapper.insert(new Ri(null,null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(Ri ri:compound.getRiList()){
-                    if(ri.getCompoundRi()==null||ri.getCompoundRi()==0)
-                        continue;
-                    validNum++;
-                    ri.setCompoundId(compound.getId());
-                    riMapper.insert(ri);
-                }
-                if(validNum==0)
-                    riMapper.insert(new Ri(null,null,null,null,compound.getId()));
+            for(Ri ri:compound.getRiList()){
+                ri.setCompoundId(compound.getId());
+                riMapper.insert(ri);
             }
 
-// 更新nri
+            // 更新nri
             QueryWrapper<Nri> nriQueryWrapper=new QueryWrapper<>();
             nriQueryWrapper.eq("compound_id",compound.getId());
             nriMapper.delete(nriQueryWrapper);
-
-            if(compound.getNriList().size()==0)
-                nriMapper.insert(new Nri(null,null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(Nri nri:compound.getNriList()){
-                    if(nri.getCompoundNri()==null||nri.getCompoundNri()==0)
-                        continue;
-                    validNum++;
-                    nri.setCompoundId(compound.getId());
-                    nriMapper.insert(nri);
-                }
-                if(validNum==0)
-                    nriMapper.insert(new Nri(null,null,null,null,compound.getId()));
+            for(Nri nri:compound.getNriList()){
+                nri.setCompoundId(compound.getId());
+                nriMapper.insert(nri);
             }
 
-            //更新otlist
+            // 更新阈值
             QueryWrapper<OdourThreshold> otQueryWrapper=new QueryWrapper<>();
             otQueryWrapper.eq("compound_id",compound.getId());
             otMapper.delete(otQueryWrapper);
-
-            if(compound.getOtList().size()==0)
-               otMapper.insert(new OdourThreshold(null,null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(OdourThreshold odourThreshold:compound.getOtList()){
-                    if(odourThreshold.getOdourThreshold()==null||odourThreshold.getOdourThreshold().intValue()==0)
-                        continue;
-                    validNum++;
-                    odourThreshold.setCompoundId(compound.getId());
-                    otMapper.insert(odourThreshold);
-                }
-                if(validNum==0)
-                    otMapper.insert(new OdourThreshold(null,null,null,null,compound.getId()));
+            for(OdourThreshold odourThreshold:compound.getOtList()){
+                odourThreshold.setCompoundId(compound.getId());
+                otMapper.insert(odourThreshold);
             }
 
-            //更新odlist
+            // 更新odlist
             QueryWrapper<OdourDescription> odQueryWrapper=new QueryWrapper<>();
             odQueryWrapper.eq("compound_id",compound.getId());
             odMapper.delete(odQueryWrapper);
-
-            if(compound.getOdList().size()==0)
-                odMapper.insert(new OdourDescription(null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(OdourDescription odourDescription:compound.getOdList()){
-                    if(odourDescription.getOdourDescription()==null||odourDescription.getOdourDescription().equals(""))
-                        continue;
-                    validNum++;
-                    odourDescription.setCompoundId(compound.getId());
-                    odMapper.insert(odourDescription);
-                }
-                if(validNum==0)
-                    odMapper.insert(new OdourDescription(null,null,null,compound.getId()));
+            for(OdourDescription odourDescription:compound.getOdList()){
+                odourDescription.setCompoundId(compound.getId());
+                odMapper.insert(odourDescription);
             }
 
             QueryWrapper<Measured> mrQueryWrapper=new QueryWrapper<>();
             mrQueryWrapper.eq("compound_id",compound.getId());
             measuredMapper.delete(mrQueryWrapper);
-
-            if(compound.getMrList().size()==0)
-                measuredMapper.insert(new Measured(null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(Measured measured:compound.getMrList()){
-                    if(measured.getMeasured()==null||measured.getMeasured().intValue()==0)
-                        continue;
-                    validNum++;
-                    measured.setCompoundId(compound.getId());
-                    measuredMapper.insert(measured);
-                }
-                if(validNum==0)
-                    measuredMapper.insert(new Measured(null,null,null,compound.getId()));
+            for(Measured measured:compound.getMrList()){
+                measured.setCompoundId(compound.getId());
+                measuredMapper.insert(measured);
             }
-
 
             QueryWrapper<LowMeasured> lmrQueryWrapper=new QueryWrapper<>();
             lmrQueryWrapper.eq("compound_id",compound.getId());
             lowmeasuredMapper.delete(lmrQueryWrapper);
-
-            if(compound.getLowmrList().size()==0)
-                lowmeasuredMapper.insert(new LowMeasured(null,null,null,compound.getId()));
-            else{
-                int validNum=0;
-                for(LowMeasured lowmeasured:compound.getLowmrList()){
-                    if(lowmeasured.getMeasured()==null||lowmeasured.getMeasured().intValue()==0)
-                        continue;
-                    validNum++;
-                    lowmeasured.setCompoundId(compound.getId());
-                    lowmeasuredMapper.insert(lowmeasured);
-                }
-                if(validNum==0)
-                    lowmeasuredMapper.insert(new LowMeasured(null,null,null,compound.getId()));
+            for(LowMeasured lowmeasured:compound.getLowmrList()){
+                lowmeasured.setCompoundId(compound.getId());
+                lowmeasuredMapper.insert(lowmeasured);
             }
-
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -592,8 +412,11 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     }
 
     @Override
-    public List<Compound> list(){
-        return compoundMapper.selectAll();
+    public PageResult getList(Integer current, Integer size){
+        PageHelper.startPage(current, size);
+        List<Compound> compoundList = compoundMapper.selectAll();
+        PageInfo<Compound> pageInfo = new PageInfo<>(compoundList);
+        return PageUtil.getPageResult(pageInfo);
     }
     @Override
     public List<Compound> getNews() {

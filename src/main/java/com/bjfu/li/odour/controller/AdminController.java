@@ -10,11 +10,6 @@ import com.bjfu.li.odour.utils.MD5Utils;
 import com.bjfu.li.odour.vo.DownloadFileVo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.ui.ModelMap;
-import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -46,23 +41,23 @@ public class AdminController {
 
     /**
      *
-     * @param account 账号
-     * @param password 密码
+     * @param admin admin账号
      * @return token
      * @throws UnsupportedEncodingException 编码错误
      */
     @PostMapping("/login")
-    public SverResponse<String> login(@RequestParam String account,
-                                      @RequestParam String password) throws UnsupportedEncodingException {
-        Integer adminId=adminService.loginCheck(account,password);
+    public SverResponse<String> login(
+            @RequestBody Admin admin
+    ) throws UnsupportedEncodingException {
+        Integer adminId=adminService.loginCheck(admin.getAccount(),admin.getPassword());
         if(adminId!=null) {
             UpdateWrapper<Admin> updateWrapper=new UpdateWrapper<>();
             updateWrapper.set("last_login_time",LocalDateTime.now())
-                    .eq("account",account);
+                    .eq("account",admin.getAccount());
             adminService.update(updateWrapper);
 
             Map<String, String> payload = new HashMap<>();
-            payload.put("account", account);
+            payload.put("account", admin.getPassword());
             payload.put("id",Integer.toString(adminId));
             String token = JWTUtils.getToken(payload);
             return SverResponse.createRespBySuccess("Success", token);

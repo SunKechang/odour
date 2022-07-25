@@ -2,6 +2,8 @@ package com.bjfu.li.odour.service;
 
 import com.bjfu.li.odour.po.Compound;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.bjfu.li.odour.utils.PageResult;
+import com.bjfu.li.odour.vo.CompoundVo;
 
 import java.util.List;
 import java.util.Map;
@@ -20,4 +22,5 @@ public interface ICompoundService extends IService<Compound> {
     List<Compound> getNews();
     boolean save(Compound compound);
     boolean updateById(Compound compound);
+    PageResult getList(Integer current, Integer size);
 }

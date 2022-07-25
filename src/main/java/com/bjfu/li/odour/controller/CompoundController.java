@@ -7,10 +7,12 @@ import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.po.Log;
 import com.bjfu.li.odour.po.LowMeasured;
 import com.bjfu.li.odour.po.Measured;
+import com.bjfu.li.odour.service.ICompoundService;
 import com.bjfu.li.odour.service.impl.CompoundServiceImpl;
 import com.bjfu.li.odour.service.impl.LogServiceImpl;
 import com.bjfu.li.odour.utils.Excel;
 import com.bjfu.li.odour.utils.ExcelUtils;
+import com.bjfu.li.odour.utils.PageResult;
 import com.bjfu.li.odour.utils.ProExcel;
 import com.bjfu.li.odour.vo.NewsVo;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,9 @@ public class CompoundController {
 
     @Resource
     LogServiceImpl logService;
+
+    @Resource
+    ICompoundService iCompoundService;
 
 
     /**
@@ -80,7 +85,8 @@ public class CompoundController {
                 continue;
             }
            else {
-           compounds.add(compound.get(0));}
+            compounds.add(compound.get(0));
+           }
         }
 
         System.out.println(compounds.get(1));
@@ -121,6 +127,7 @@ public class CompoundController {
      */
     @PostMapping("/add")
     public SverResponse<String> addCompound(@RequestBody Compound compound, HttpServletRequest request){
+        System.out.println(compound.getChemicalStructure());
         System.out.println(compound.getChemicalStructure());
         if(compoundService.save(compound)) {
             String token= request.getHeader("Authorization");
@@ -182,9 +189,12 @@ public class CompoundController {
      * @return 所有化合物信息
      */
     @GetMapping("/all")
-    public SverResponse<List<Compound>> getCompounds(){
-        List<Compound> compounds = compoundService.list();
-        return SverResponse.createRespBySuccess(compounds);
+    public SverResponse<PageResult> getCompounds(
+            @RequestParam(defaultValue = "1", value = "page") Integer page,
+            @RequestParam(defaultValue = "10",value = "size") Integer size
+    ){
+        PageResult pageResult = iCompoundService.getList(page,size);
+        return SverResponse.createRespBySuccess(pageResult);
     }
 
 
