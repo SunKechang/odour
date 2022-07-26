@@ -9,25 +9,17 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 public class ProExcel {
-    public static String createExcelFile(HttpServletResponse response, List<Compound> compounds, List<String> needSheet) throws Exception {
+    public static String createExcelFile(HttpServletResponse response, List<Compound> compounds, List<String> needSheet) {
         OutputStream outputStream = null;
-//        boolean state = false;
-//        OutputStream os = null;
-//        FileOutputStream fos = null;
-//        String resultFileName = null;
-//        String fileName = "";
         try {
             org.apache.poi.ss.usermodel.Workbook wb;
-//            fileName = "procompound.xls";
             wb = createReportWorkbook(compounds,needSheet);
 //
 //            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");

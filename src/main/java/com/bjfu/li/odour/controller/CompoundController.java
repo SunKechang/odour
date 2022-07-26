@@ -8,13 +8,13 @@ import com.bjfu.li.odour.po.Log;
 import com.bjfu.li.odour.po.LowMeasured;
 import com.bjfu.li.odour.po.Measured;
 import com.bjfu.li.odour.service.ICompoundService;
-import com.bjfu.li.odour.service.impl.CompoundServiceImpl;
 import com.bjfu.li.odour.service.impl.LogServiceImpl;
 import com.bjfu.li.odour.utils.Excel;
 import com.bjfu.li.odour.utils.ExcelUtils;
 import com.bjfu.li.odour.utils.PageResult;
 import com.bjfu.li.odour.utils.ProExcel;
 import com.bjfu.li.odour.vo.NewsVo;
+import com.bjfu.li.odour.vo.SearchVo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,82 +41,51 @@ import java.util.Map;
 @RequestMapping("/compound")
 public class CompoundController {
 
-    @Resource
-    CompoundServiceImpl compoundService;
 
     @Resource
     LogServiceImpl logService;
 
     @Resource
-    ICompoundService iCompoundService;
-
-
+    ICompoundService compoundService;
     /**
      *
-     * @param property 属性
-     * @param propertyDescription 属性描述
+     * @param searchVo 查询条件
      * @return 搜索结果
      */
     @PostMapping("/search")
-    public SverResponse<List<Compound>> searchCompounds(@RequestParam String property, @RequestParam String propertyDescription){
-        List<Compound> compounds=compoundService.searchCompounds(property,propertyDescription);
-        return SverResponse.createRespBySuccess(compounds);
+    public SverResponse<PageResult> searchCompounds(
+            @RequestBody SearchVo searchVo
+    ){
+        PageResult pageResult = compoundService.searchList(searchVo);
+        return SverResponse.createRespBySuccess(pageResult);
     }
 
     @PostMapping("/download")
-    public SverResponse<List<Compound>> downloadCompounds(@RequestBody List<Compound> compounds,HttpServletResponse response) throws Exception {
-        System.out.println(response);
-        Excel excel=new Excel();
-        String strResult=excel.createExcelFile(response,compounds);
-
-           return SverResponse.createRespBySuccess();
+    public SverResponse<List<Compound>> downloadCompounds(
+            @RequestBody List<Compound> compounds,
+            HttpServletResponse response
+    ) {
+        Excel.createExcelFile(response,compounds);
+        return SverResponse.createRespBySuccess();
     }
 
 
     @PostMapping("/downloadpro")
-    public void downloadProCompounds(@RequestBody  Map<String,List<String>> dataMap,HttpServletResponse response) throws Exception {
+    public void downloadProCompounds(@RequestBody  Map<String,List<String>> dataMap,HttpServletResponse response) {
         System.out.println(dataMap);
         List<Compound> compounds=new ArrayList<>();
         List<String> needSheet = dataMap.get("check");
 
         for(int i=0;i<dataMap.get("cas").size();i++) {
-           List<Compound> compound = compoundService.searchByCasPro(dataMap.get("cas").get(i));
-           if(compound.isEmpty()){
-                continue;
-            }
-           else {
-            compounds.add(compound.get(0));
-           }
+//           List<Compound> compound = compoundService.searchByCasPro(dataMap.get("cas").get(i));
+//           if(compound.isEmpty()){
+//                continue;
+//            }
+//           else {
+//            compounds.add(compound.get(0));
+//           }
         }
-
-        System.out.println(compounds.get(1));
-        System.out.println(compounds.get(1).getCasNo());
-
-        ProExcel excel=new ProExcel();
-        String strResult=excel.createExcelFile(response,compounds,needSheet);
-//        return SverResponse.createRespBySuccess();
-
-
-
-
-    }
-    /**
-     *
-     * @param properties 多个属性及其描述
-     * @return 搜索结果
-     */
-    @PostMapping("/advanced")
-    public SverResponse<List<Compound>> advancedSearch(@RequestParam Map<String,String> properties){
-        List<Compound> compounds=compoundService.advancedSearch(properties);
-        return SverResponse.createRespBySuccess(compounds);
-    }
-
-    @GetMapping("/{id}")
-    public SverResponse<List<Compound>> getCompound(@PathVariable Integer id){
-        Compound compound=compoundService.getById(id);
-        List<Compound> compoundList=new ArrayList<>();
-        compoundList.add(compound);
-        return SverResponse.createRespBySuccess(compoundList);
+        ProExcel.createExcelFile(response,compounds,needSheet);
     }
 
     /**
@@ -185,18 +154,29 @@ public class CompoundController {
     }
 
     /**
-     *
-     * @return 所有化合物信息
+     * @return 获取所有化合物列表
      */
     @GetMapping("/all")
     public SverResponse<PageResult> getCompounds(
             @RequestParam(defaultValue = "1", value = "page") Integer page,
             @RequestParam(defaultValue = "10",value = "size") Integer size
     ){
-        PageResult pageResult = iCompoundService.getList(page,size);
+        SearchVo searchVo = new SearchVo();
+        searchVo.setPage(page);
+        searchVo.setSize(size);
+        PageResult pageResult = compoundService.getList(searchVo);
         return SverResponse.createRespBySuccess(pageResult);
     }
-
+    /**
+     * 获取单条化合物信息
+     */
+    @GetMapping("/{id}")
+    public SverResponse<Compound> getOne(
+            @PathVariable Integer id
+    ){
+        Compound compound = compoundService.getOne(id);
+        return SverResponse.createRespBySuccess(compound);
+    }
 
     /**
      *
@@ -221,7 +201,6 @@ public class CompoundController {
     public SverResponse<List<Measured>> readMRExcel(@RequestParam MultipartFile mrExcel) throws IOException {
         String fileName = mrExcel.getOriginalFilename();
         String uploadPath = System.getProperty("user.dir")+"/"+fileName;
-
         File file = new File(uploadPath);
         FileOutputStream out = new FileOutputStream(uploadPath);
         out.write(mrExcel.getBytes());
@@ -229,7 +208,6 @@ public class CompoundController {
         out.close();
         List<Measured> mrList= ExcelUtils.readXls(uploadPath);
         file.delete();
-
         return SverResponse.createRespBySuccess(mrList);
     }
 
@@ -250,10 +228,4 @@ public class CompoundController {
 
         return SverResponse.createRespBySuccess(lmrList);
     }
-
-//    @RequestMapping("/export")
-//    public void export(HttpServletRequest request, HttpServletResponse response) throws Exception {
-//        excelService.exportData(request,response);
-//    }
-
 }

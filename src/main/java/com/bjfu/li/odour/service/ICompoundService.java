@@ -1,12 +1,11 @@
 package com.bjfu.li.odour.service;
 
-import com.bjfu.li.odour.po.Compound;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.utils.PageResult;
-import com.bjfu.li.odour.vo.CompoundVo;
+import com.bjfu.li.odour.vo.SearchVo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -17,10 +16,11 @@ import java.util.Map;
  * @since 2020-11-06
  */
 public interface ICompoundService extends IService<Compound> {
-    List<Compound> searchCompounds(String property,String propertyDescription);
-    List<Compound> advancedSearch(Map<String,String> properties);
+    PageResult searchList(SearchVo searchVo);
     List<Compound> getNews();
     boolean save(Compound compound);
     boolean updateById(Compound compound);
-    PageResult getList(Integer current, Integer size);
+    PageResult getList(SearchVo searchVo);
+    Compound getOne(Integer id);
+    List<Compound> dynamicSelect(List<SearchVo> searchVoList);
 }

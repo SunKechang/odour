@@ -1,8 +1,6 @@
 package com.bjfu.li.odour.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bjfu.li.odour.mapper.*;
 import com.bjfu.li.odour.po.*;
@@ -10,17 +8,17 @@ import com.bjfu.li.odour.service.ICompoundService;
 import com.bjfu.li.odour.utils.Base64Utils;
 import com.bjfu.li.odour.utils.PageResult;
 import com.bjfu.li.odour.utils.PageUtil;
-import com.bjfu.li.odour.vo.CompoundVo;
+import com.bjfu.li.odour.vo.SearchVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -56,116 +54,59 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     @Resource
     ProductKeyMapper productKeyMapper;
     @Resource
+    ProductMapper productMapper;
+    @Resource
     ProductOdourThresholdMapper productOtMapper;
     @Resource
     ProductOdourDescriptionMapper productOdMapper;
-
-
-
     @Value("${localImgPath}")
     String localImgPath;
     @Value("${networkImgPath}")
     String networkImgPath;
 
     @Override
-    public List<Compound> searchCompounds(String property, String propertyDescription) {
-        propertyDescription=propertyDescription.trim();
+    public PageResult searchList(SearchVo searchVo) {
+        String propertyDescription = searchVo.getSearchValue().toString().trim();
+        String property = searchVo.getSearchProperty();
+        List<Compound> compoundList;
         switch (property) {
-            case "compound_name":
-                return compoundMapper.selectByCompoundName(propertyDescription);
             case "odour_description":
-                String description = propertyDescription;
-                return   compoundMapper.selectByOdourDescription(description);
+                compoundList = compoundMapper.selectByOdourDescription(propertyDescription);
+                break;
             case "odour_threshold":
                 int odourThreshold= Integer.parseInt(propertyDescription);
-                return compoundMapper.selectByOdourThreshold(odourThreshold-10,odourThreshold+10);
-            case "cas_no":
-                propertyDescription=propertyDescription.replaceAll("-","");
-                return compoundMapper.selectByCasNo(propertyDescription);
+                compoundList = compoundMapper.selectByOdourThreshold(odourThreshold-10,odourThreshold+10);
+                break;
             case "compound_ri":
                 int ri= Integer.parseInt(propertyDescription);
-                return compoundMapper.selectByRi(ri-100,ri+100);
+                compoundList = compoundMapper.selectByRi(ri-100,ri+100);
+                break;
             case "compound_nri":
                 int nri= Integer.parseInt(propertyDescription);
-                return compoundMapper.selectByNri(nri-100,nri+100);
+                compoundList = compoundMapper.selectByNri(nri-100,nri+100);
+                break;
             case "measured":
                 double measured= Double.parseDouble(propertyDescription);
-                return compoundMapper.selectByMeasured(measured-0.05,measured+0.05);
+                compoundList = compoundMapper.selectByMeasured(measured-0.05,measured+0.05);
+                break;
             case "lowmeasured":
                 double lowmeasured= Double.parseDouble(propertyDescription);
-                return compoundMapper.selectByLowMeasured(lowmeasured-0.05,lowmeasured+0.05);
-
+                compoundList = compoundMapper.selectByLowMeasured(lowmeasured-0.05,lowmeasured+0.05);
+                break;
+            case "product":
+                compoundList = compoundMapper.selectByProduct(propertyDescription);
+                break;
+            default:
+                searchVo.setSearchRule("like");
+                searchVo.setSearchValue(propertyDescription);
+                searchVo.setSearchProperty(property);
+                List<SearchVo> searchVoList = new ArrayList<>();
+                searchVoList.add(searchVo);
+                compoundList = this.dynamicSelect(searchVoList);
         }
-
-        return null;
-    }
-
-    public List<Compound> searchByCasPro(String cas){
-        cas=cas.replaceAll("-","");
-        return compoundMapper.selectByCasPro(cas);
-    }
-
-    @Override
-    public List<Compound> advancedSearch(Map<String, String> properties) {
-        if(properties.size()==0)
-            return list();
-        else if(properties.size()==1) {
-            String property="",propertyDescription="";
-            for(Map.Entry<String,String> e:properties.entrySet()){
-                if(e!=null){
-                    property=e.getKey();
-                    propertyDescription=e.getValue();
-                    break;
-                }
-            }
-            return  searchCompounds(property,propertyDescription);
-        }
-
-        if(!properties.containsKey("odour_description"))
-            return compoundMapper.selectByProperties(properties);
-        else{
-            QueryWrapper<Compound> compoundQueryWrapper=new QueryWrapper<>();
-            for(Map.Entry<String,String> e:properties.entrySet()){
-                String property=e.getKey();
-                String propertyDescription=e.getValue().trim();
-                switch (property) {
-                    case "compound_name":
-                        compoundQueryWrapper.and(wrapper->wrapper
-                                .like(property, propertyDescription)
-                                .or()
-                                .like("synonym", propertyDescription));
-                        break;
-                    case "odour_description":
-                        String[] descriptions = propertyDescription.split(",");
-                        System.out.println(Arrays.toString(descriptions));
-                        for (String description : descriptions) {
-                            description=description.trim();
-                            compoundQueryWrapper.like(property, description);
-                        }
-                        break;
-                    case "cas_no":
-                        compoundQueryWrapper.eq(property, propertyDescription);
-                        break;
-                }
-            }
-            List<Compound> compounds=compoundMapper.selectList(compoundQueryWrapper);
-            for(Compound c:compounds){
-                QueryWrapper<Ri> riQueryWrapper=new QueryWrapper<>();
-                riQueryWrapper.eq("compound_id",c.getId());
-                c.setRiList(riMapper.selectList(riQueryWrapper));
-
-                QueryWrapper<Measured> mrQueryWrapper=new QueryWrapper<>();
-                mrQueryWrapper.eq("compound_id",c.getId());
-                c.setMrList(measuredMapper.selectList(mrQueryWrapper));
-            }
-            return compounds;
-        }
-
-    }
-
-
-    public Compound getById(Integer id){
-        return compoundMapper.selectOne(id);
+        PageHelper.startPage(searchVo.getPage(), searchVo.getSize());
+        PageInfo<Compound> pageInfo = new PageInfo<>(compoundList);
+        return PageUtil.getPageResult(pageInfo);
     }
 
     @Override
@@ -412,12 +353,77 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     }
 
     @Override
-    public PageResult getList(Integer current, Integer size){
-        PageHelper.startPage(current, size);
+    public PageResult getList(SearchVo searchVo){
+        PageHelper.startPage(searchVo.getPage(), searchVo.getSize());
         List<Compound> compoundList = compoundMapper.selectAll();
         PageInfo<Compound> pageInfo = new PageInfo<>(compoundList);
         return PageUtil.getPageResult(pageInfo);
     }
+
+    @Override
+    public Compound getOne(Integer id) {
+        Compound compound = compoundMapper.selectOne(id);
+        // odList
+        QueryWrapper<OdourDescription> odQueryWrapper=new QueryWrapper<>();
+        odQueryWrapper.eq("compound_id", id);
+        compound.setOdList(odMapper.selectList(odQueryWrapper));
+        // otList
+        QueryWrapper<OdourThreshold> otQueryWrapper=new QueryWrapper<>();
+        otQueryWrapper.eq("compound_id", id);
+        compound.setOtList(otMapper.selectList(otQueryWrapper));
+        // riList
+        QueryWrapper<Ri> riQueryWrapper=new QueryWrapper<>();
+        riQueryWrapper.eq("compound_id", id);
+        compound.setRiList(riMapper.selectList(riQueryWrapper));
+        // nriList
+        QueryWrapper<Nri> nriQueryWrapper=new QueryWrapper<>();
+        nriQueryWrapper.eq("compound_id", id);
+        compound.setNriList(nriMapper.selectList(nriQueryWrapper));
+        // mrList
+        QueryWrapper<Measured> mrQueryWrapper=new QueryWrapper<>();
+        mrQueryWrapper.eq("compound_id", id);
+        compound.setMrList(measuredMapper.selectList(mrQueryWrapper));
+        // lowmrList
+        QueryWrapper<LowMeasured> lowmrQueryWrapper=new QueryWrapper<>();
+        lowmrQueryWrapper.eq("compound_id", id);
+        compound.setLowmrList(lowmeasuredMapper.selectList(lowmrQueryWrapper));
+        // productList
+        QueryWrapper<ProductKey> keyQueryWrapper = new QueryWrapper<>();
+        keyQueryWrapper.eq("compound_id", id);
+        List<ProductKey> productKeyList = productKeyMapper.selectList(keyQueryWrapper);
+        List<Product> productList = new ArrayList<>();
+        for (ProductKey productKey: productKeyList) {
+            Product product;
+            Integer productId = productKey.getProductId();
+            product = productMapper.selectById(productId);
+            QueryWrapper<ProductOdourDescription> productOdQueryWrapper = new QueryWrapper<>();
+            productOdQueryWrapper.eq("compound_id", id);
+            productOdQueryWrapper.eq("product_id", productId);
+            product.setOdList(productOdMapper.selectList(productOdQueryWrapper));
+            QueryWrapper<ProductOdourThreshold> productOtQueryWrapper = new QueryWrapper<>();
+            productOtQueryWrapper.eq("compound_id", id);
+            productOtQueryWrapper.eq("product_id", productId);
+            product.setOtList(productOtMapper.selectList(productOtQueryWrapper));
+            productList.add(product);
+        }
+        compound.setProductList(productList);
+        return compound;
+    }
+
+    @Override
+    public List<Compound> dynamicSelect(List<SearchVo> searchVoList) {
+        //为了测试连表和前后端字段名不一致，可省略
+        for (SearchVo searchVo : searchVoList) {
+            if (StringUtils.equalsIgnoreCase("id", searchVo.getSearchProperty())){
+                searchVo.setSearchProperty("compound.id");
+            }else if (StringUtils.equalsIgnoreCase("compound_name", searchVo.getSearchProperty())) {
+                searchVo.setSearchProperty("compound.compound_name");
+            }
+        }
+        return compoundMapper.dynamicSelect(searchVoList);
+    }
+
+
     @Override
     public List<Compound> getNews() {
         return compoundMapper.selectNewsList();

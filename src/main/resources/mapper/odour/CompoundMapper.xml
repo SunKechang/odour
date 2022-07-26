@@ -62,254 +62,67 @@
             <result column="low_compound_id" property="compoundId"/>
         </collection>
     </resultMap>
-
-    <select id="selectByRi" resultMap="CompoundRiMap" >
-        select c.*,
-            ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-            nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
-            ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
-            od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-            measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-            low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
-
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and c.id in (
-            select ri.compound_id
-            from ri
-            where (ri.compound_ri between #{low} and #{high})
-        )
-    </select>
-
-    <select id="selectByNri" resultMap="CompoundRiMap" >
-        select c.*,
-            ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-            nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
-            ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
-            od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-            measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-            low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
-
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and c.id in (
-            select nri.compound_id
-            from nri
-            where (nri.compound_nri between #{low} and #{high})
-        )
-    </select>
-
-    <select id="selectByMeasured" resultMap="CompoundRiMap" >
-        select c.*,
-            ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-            nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
-            ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
-            od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-            measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-            low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
-
-
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and c.id in (
-            select measured.compound_id
-            from measured
-            where (measured.measured between #{low} and #{high})
-        )
-    </select>
-
-    <select id="selectByLowMeasured" resultMap="CompoundRiMap" >
-        select c.*,
-            ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-            nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
-            ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
-            od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-            measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-            low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
-
-
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and c.id in (
-            select low_measured.compound_id
-            from low_measured
-            where (low_measured.measured between #{low} and #{high})
-        )
-    </select>
-
-    <select id="selectByOdourThreshold" resultMap="CompoundRiMap" >
-        select c.*,
-            ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-            nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
-            ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
-            od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-            measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-            low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
-
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and c.id in (
-            select odour_threshold.compound_id
-            from odour_threshold
-            where (odour_threshold.odour_threshold between #{low} and #{high})
-        )
-    </select>
-
-    <select id="selectByOdourDescription" resultMap="CompoundRiMap" >
-        select c.*,
-            ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-            nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
-            ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
-            od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-            measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-            low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
-
-
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and c.id in (
-            select odour_description.compound_id
-            from odour_description
-            where (odour_description.odour_description like "%"#{description}"%" )
-        )
-    </select>
-
     <select id="selectOne" resultMap="CompoundRiMap">
-        select c.*,
-            ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.compound_id,
-            measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id
-        from compound as c,ri,measured
-        where c.id=ri.compound_id
-        and c.id=measured.compound_id
-        and c.id=#{id}
+        SELECT c.*
+        FROM compound AS c
+        WHERE c.id=#{id};
     </select>
-
-
     <select id="selectAll" resultMap="CompoundRiMap">
-        select * from compound
+        SELECT * FROM compound WHERE is_deleted = 0
     </select>
-
-    <select id="selectByCompoundName" resultMap="CompoundRiMap">
-        select c.*,
-               ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-
-               nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
-               ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
-               od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-               measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-               low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
-
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and (compound_name like "%"#{name}"%" or synonym like "%"#{name}"%")
+    <select id="dynamicSelect" resultMap="CompoundRiMap">
+        SELECT * FROM compound compound
+        <where>
+            <foreach collection="list" index="index" item="searchVo" open=" " separator=" " close=" ">
+                <if test="searchVo.searchRule == 'equal'">
+                    AND ${searchVo.searchProperty} = #{searchVo.searchValue}
+                </if>
+                <if test="searchVo.searchRule == 'large'">
+                    AND ${searchVo.searchProperty} &gt; #{searchVo.searchValue}
+                </if>
+                <if test="searchVo.searchRule == 'small'">
+                    AND ${searchVo.searchProperty} &lt; #{searchVo.searchValue}
+                </if>
+                <if test="searchVo.searchRule == 'like'">
+                    AND ${searchVo.searchProperty} like concat("%", #{searchVo.searchValue}, "%")
+                </if>
+            </foreach>
+        </where>
     </select>
-
-    <select id="selectByCasNo" resultMap="CompoundRiMap">
-        select c.*,
-               ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-
-               nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
---        odour_threshold.id as otrid,odour_threshold.odour_threshold,odour_threshold.odour_threshold_reference,odour_threshold.odour_base,odour_threshold.compound_id as ot_compound_id,
-               ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
---                odour_description.id as odrid,odour_description.odour_description,odour_description.odour_description_reference,odour_description.compound_id as od_compound_id,
-               od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-               measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-               low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
--- from compound as c,ri,measured,nri,low_measured,odour_description,odour_threshold
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and cas_no=#{casNo}
+    <select id="selectByOdourDescription" resultMap="CompoundRiMap" >
+        SELECT * FROM compound compound
+        LEFT JOIN odour_description od ON od.compound_id = compound.id
+        WHERE od.odour_description like "%"#{description}"%" AND compound.is_deleted = 0
     </select>
-
-    <select id="selectByCasPro" resultMap="CompoundRiMap">
-        select c.*,
-               ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.ri_resource as ri_resource,ri.compound_id as ri_compound_id,
-
-               nri.id as nrid,nri.compound_nri,nri.chromatographic_column as nri_chromatographic_column,nri.nri_resource as nri_resource,nri.compound_id as nri_compound_id,
---        odour_threshold.id as otrid,odour_threshold.odour_threshold,odour_threshold.odour_threshold_reference,odour_threshold.odour_base,odour_threshold.compound_id as ot_compound_id,
-               ot.id as otrid,ot.odour_threshold as ot_odour_threshold,ot.odour_threshold_reference as ot_odour_threshold_reference,ot.odour_base as ot_odour_base ,ot.compound_id as ot_compound_id,
---                odour_description.id as odrid,odour_description.odour_description,odour_description.odour_description_reference,odour_description.compound_id as od_compound_id,
-               od.id as odrid,od.odour_description as od_odour_description,od.odour_description_reference as od_odour_description_reference,od.compound_id as od_compound_id,
-               measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id as high_compound_id,
-               low_measured.id as lmrid,low_measured.measured as low_measured,low_measured.relative_abundance as low_relative_abundance,low_measured.compound_id as low_compound_id
--- from compound as c,ri,measured,nri,low_measured,odour_description,odour_threshold
-        from compound as c,ri,measured,nri,low_measured,odour_description as od,odour_threshold as ot
-        where c.id=ri.compound_id
-          and c.id=nri.compound_id
-          and c.id=ot.compound_id
-          and c.id=od.compound_id
-          and c.id=measured.compound_id
-          and c.id=low_measured.compound_id
-        and cas_no=#{casNo}
+    <select id="selectByOdourThreshold" resultMap="CompoundRiMap" >
+        SELECT * FROM compound compound
+        LEFT JOIN odour_threshold ot ON ot.compound_id = compound.id
+        WHERE ot.odour_threshold between #{low} and #{high} AND compound.is_deleted = 0
     </select>
-
-<!--    <select id="selectByOdourDescription" resultMap="CompoundRiMap">-->
-<!--        select c.*,-->
-<!--        ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.compound_id,-->
-<!--        measured.id as mrid,measured.measured,measured.relative_abundance,measured.compound_id-->
-<!--        from compound as c,ri,measured-->
-<!--        where c.id=ri.compound_id-->
-<!--        and c.id=measured.compound_id-->
-<!--        <foreach collection="array" item="description" index="index"  separator=" " >-->
-<!--            and odour_description like "%"#{description}"%"-->
-<!--        </foreach>-->
-<!--    </select>-->
-
-    <select id="selectByProperties" resultMap="CompoundRiMap"  parameterType="map">
-        select c.*,ri.id as rid,ri.compound_ri,ri.chromatographic_column,ri.compound_id
-        from compound as c,ri,measured
-        where c.id=ri.compound_id
-        <if test="_parameter.containsKey('compound_name')">
-            and (compound_name like "%"#{compound_name}"%" or synonym like "%"#{compound_name}"%")
-        </if>
-        <if test="_parameter.containsKey('cas_no')">
-            and cas_no=#{cas_no}
-        </if>
-        <if test="_parameter.containsKey('compound_ri')">
-            and (ri.compound_ri between #{compound_ri}-100  and #{compound_ri}+100)
-        </if>
-        <if test="_parameter.containsKey('measured')">
-            and (measured.measured between #{measured}-100  and #{measured}+100)
-        </if>
+    <select id="selectByRi" resultMap="CompoundRiMap" >
+        SELECT * FROM compound compound
+        LEFT JOIN ri ri ON ri.compound_id = compound.id
+        WHERE ri.compound_ri between #{low} and #{high} AND compound.is_deleted = 0
+    </select>
+    <select id="selectByNri" resultMap="CompoundRiMap" >
+        SELECT * FROM compound compound
+        LEFT JOIN nri nri ON nri.compound_id = compound.id
+        WHERE nri.compound_ri between #{low} and #{high} AND compound.is_deleted = 0
+    </select>
+    <select id="selectByMeasured" resultMap="CompoundRiMap">
+        SELECT * FROM compound compound
+        LEFT JOIN measured measured ON measured.compound_id = compound.id
+        WHERE measured.measured between #{low} and #{high} AND compound.is_deleted = 0
+    </select>
+    <select id="selectByLowMeasured" resultMap="CompoundRiMap">
+        SELECT * FROM compound compound
+        LEFT JOIN low_measured low_measured ON low_measured.compound_id = compound.id
+        WHERE low_measured.measured between #{low} and #{high} AND compound.is_deleted = 0
+    </select>
+    <select id="selectByProduct" resultMap="CompoundRiMap">
+        SELECT * FROM compound compound
+        LEFT JOIN product_key pk ON pk.compound_id = compound.id
+        LEFT JOIN product product ON product.id = pk.product_id
+        WHERE product.product_name like "%"#{product}"%"  AND compound.is_deleted = 0
     </select>
 </mapper>
