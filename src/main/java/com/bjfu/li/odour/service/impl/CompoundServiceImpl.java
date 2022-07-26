@@ -161,38 +161,43 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 lowmeasuredMapper.insert(lowMeasured);
             }
             // 产品
-            if (compound.getProductList().size() != 0) {
-                for (Product product:compound.getProductList()) {
-                    // Product 和 Compound 对应关系
-                    ProductKey productKey = new ProductKey();
-                    productKey.setProductId(product.getId());
-                    productKey.setCompoundId(compound.getId());
-                    // Product 风味阈值
-                    List<ProductOdourThreshold> productOtList = product.getOtList();
-                    for (ProductOdourThreshold productOt: productOtList) {
-                        productOt.setCompoundId(compound.getId());
-                        productOtMapper.insert(productOt);
-                    }
-                    List<ProductOdourDescription> productOdList = product.getOdList();
-                    for (ProductOdourDescription productOd: productOdList) {
-                        productOd.setCompoundId(compound.getId());
-                        productOdMapper.insert(productOd);
-                    }
-                    // Product 风味描述
-                    productKeyMapper.insert(productKey);
-                }
-            }
-            return true;
+            return insertProducts(compound);
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
     }
+
+    private boolean insertProducts(Compound compound) {
+        if (compound.getProductList().size() != 0) {
+            for (Product product:compound.getProductList()) {
+                // Product 和 Compound 对应关系
+                ProductKey productKey = new ProductKey();
+                productKey.setProductId(product.getId());
+                productKey.setCompoundId(compound.getId());
+                // Product 风味阈值
+                List<ProductOdourThreshold> productOtList = product.getOtList();
+                for (ProductOdourThreshold productOt: productOtList) {
+                    productOt.setCompoundId(compound.getId());
+                    productOtMapper.insert(productOt);
+                }
+                List<ProductOdourDescription> productOdList = product.getOdList();
+                for (ProductOdourDescription productOd: productOdList) {
+                    productOd.setCompoundId(compound.getId());
+                    productOdMapper.insert(productOd);
+                }
+                // Product 风味描述
+                productKeyMapper.insert(productKey);
+            }
+        }
+        return true;
+    }
+
     @Override
-    public boolean updateById(Compound compound) {
-        String chemicalStructure = compound.getChemicalStructure();
-        String massSpectrogram = compound.getMassSpectrogram();
-        String massSpectrogramNist = compound.getMassSpectrogramNist();
+    public boolean update(Compound compound) {
+        String chemicalStructure = compound.getChemicalStructure() == null ? "" : compound.getChemicalStructure();
+        String massSpectrogram = compound.getMassSpectrogram() == null ? "" : compound.getMassSpectrogram();
+        String massSpectrogramNist = compound.getMassSpectrogramNist() == null ? "" : compound.getMassSpectrogramNist();
         Compound _compound= new Compound();
         if(chemicalStructure.startsWith("data")||massSpectrogram.startsWith("data"))
             _compound = compoundMapper.selectById(compound.getId());
@@ -201,43 +206,25 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             if(!chemicalStructure.equals("") & chemicalStructure.startsWith("data")) {
                 // 数据库中该数据存在
                 assert _compound != null;
-                // 文件地址能够争取解析
-                if(_compound.getChemicalStructure().lastIndexOf("/") !=-1) {
-                    // 文件名
-                    String chemicalStructureFilename = _compound.getChemicalStructure().substring(_compound.getChemicalStructure().lastIndexOf("/"));
-                    System.out.println(chemicalStructureFilename);
-                    File oldChemicalStructure = new File(localImgPath + "chemical structure/" + chemicalStructureFilename);
-                    // 删除原文件成功
-                    assert !oldChemicalStructure.exists() || oldChemicalStructure.delete();
-                }
-                chemicalStructure = networkImgPath+"chemical structure/" + Base64Utils.generateImage(chemicalStructure, localImgPath+"chemical structure/");
+                // 文件地址存在且能够争取解析
+                delChemicalStructure(_compound);
+                // 保存新的文件并更新字段
+                chemicalStructure = networkImgPath + "chemical structure/" + Base64Utils.generateImage(chemicalStructure, localImgPath+"chemical structure/");
                 compound.setChemicalStructure(chemicalStructure);
             }
             //逻辑和上面一样
-            if(!massSpectrogram.equals("")) {
-                if(massSpectrogram.startsWith("data")&&_compound!=null) {
-                    if(_compound.getMassSpectrogram().lastIndexOf("/")!=-1) {
-                        String massSpectrogramFilename = _compound.getMassSpectrogram().substring(_compound.getMassSpectrogram().lastIndexOf("/"));
-                        File oldMassSpectrogram = new File(localImgPath + "Orbitrap-MS mass spectrometry/" + massSpectrogramFilename);
-                        if (oldMassSpectrogram.exists())
-                            oldMassSpectrogram.delete();
-                    }
-                    massSpectrogram = networkImgPath+"Orbitrap-MS mass spectrometry/" + Base64Utils.generateImage(massSpectrogram, localImgPath+"Orbitrap-MS mass spectrometry/");
-                    compound.setMassSpectrogram(massSpectrogram);
-                }
+            if(!massSpectrogram.equals("") & massSpectrogram.startsWith("data")) {
+                assert _compound != null;
+                delMassSpectrogram(_compound);
+                massSpectrogram = networkImgPath+"Orbitrap-MS mass spectrometry/" + Base64Utils.generateImage(massSpectrogram, localImgPath+"Orbitrap-MS mass spectrometry/");
+                compound.setMassSpectrogram(massSpectrogram);
             }
 
-            if(!massSpectrogramNist.equals("")) {
-                if(massSpectrogramNist.startsWith("data")&&_compound!=null) {
-                    if(_compound.getMassSpectrogramNist().lastIndexOf("/")!=-1) {
-                        String massSpectrogramNistFilename = _compound.getMassSpectrogramNist().substring(_compound.getMassSpectrogramNist().lastIndexOf("/"));
-                        File oldMassSpectrogramNist = new File(localImgPath + "Low-resolution mass spectrometry/" + massSpectrogramNistFilename);
-                        if (oldMassSpectrogramNist.exists())
-                            oldMassSpectrogramNist.delete();
-                    }
-                    massSpectrogramNist = networkImgPath+"Low-resolution mass spectrometry/" + Base64Utils.generateImage(massSpectrogramNist, localImgPath+"Low-resolution mass spectrometry/");
-                    compound.setMassSpectrogramNist(massSpectrogramNist);
-                }
+            if(!massSpectrogramNist.equals("") & massSpectrogramNist.startsWith("data")) {
+                assert _compound != null;
+                delMassSpectrogramNist(_compound);
+                massSpectrogramNist = networkImgPath+"Low-resolution mass spectrometry/" + Base64Utils.generateImage(massSpectrogramNist, localImgPath+"Low-resolution mass spectrometry/");
+                compound.setMassSpectrogramNist(massSpectrogramNist);
             }
             compoundMapper.updateById(compound);
 
@@ -276,7 +263,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 odourDescription.setCompoundId(compound.getId());
                 odMapper.insert(odourDescription);
             }
-
+            // 更新 mr
             QueryWrapper<Measured> mrQueryWrapper=new QueryWrapper<>();
             mrQueryWrapper.eq("compound_id",compound.getId());
             measuredMapper.delete(mrQueryWrapper);
@@ -284,7 +271,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 measured.setCompoundId(compound.getId());
                 measuredMapper.insert(measured);
             }
-
+            // 更新 LowMeasured
             QueryWrapper<LowMeasured> lmrQueryWrapper=new QueryWrapper<>();
             lmrQueryWrapper.eq("compound_id",compound.getId());
             lowmeasuredMapper.delete(lmrQueryWrapper);
@@ -292,36 +279,62 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 lowmeasured.setCompoundId(compound.getId());
                 lowmeasuredMapper.insert(lowmeasured);
             }
-            return true;
+            // 更新 product
+            QueryWrapper<ProductKey> keyQueryWrapper=new QueryWrapper<>();
+            keyQueryWrapper.eq("compound_id",compound.getId());
+            productKeyMapper.delete(keyQueryWrapper);
+            QueryWrapper<ProductOdourDescription> productOdQueryWrapper=new QueryWrapper<>();
+            productOdQueryWrapper.eq("compound_id",compound.getId());
+            productOdMapper.delete(productOdQueryWrapper);
+            QueryWrapper<ProductOdourThreshold> productOtQueryWrapper=new QueryWrapper<>();
+            productOtQueryWrapper.eq("compound_id",compound.getId());
+            productOtMapper.delete(productOtQueryWrapper);
+            return insertProducts(compound);
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
     }
 
+    private void delMassSpectrogramNist(Compound _compound) {
+        if(_compound.getMassSpectrogramNist()!= null) {
+            if (_compound.getMassSpectrogramNist().lastIndexOf("/")!=-1) {
+                String massSpectrogramNistFilename = _compound.getMassSpectrogramNist().substring(_compound.getMassSpectrogramNist().lastIndexOf("/"));
+                File oldMassSpectrogramNist = new File(localImgPath + "Low-resolution mass spectrometry/" + massSpectrogramNistFilename);
+                assert !oldMassSpectrogramNist.exists() || oldMassSpectrogramNist.delete();
+            }
+        }
+    }
 
-    public boolean removeById(Integer id){
+    private void delMassSpectrogram(Compound _compound) {
+        if(_compound.getMassSpectrogram()!= null) {
+            if (_compound.getMassSpectrogram().lastIndexOf("/")!=-1) {
+                String massSpectrogramFilename = _compound.getMassSpectrogram().substring(_compound.getMassSpectrogram().lastIndexOf("/"));
+                File oldMassSpectrogram = new File(localImgPath + "Orbitrap-MS mass spectrometry/" + massSpectrogramFilename);
+                assert !oldMassSpectrogram.exists() || oldMassSpectrogram.delete();
+            }
+        }
+    }
+
+    private void delChemicalStructure(Compound _compound) {
+        if(_compound.getChemicalStructure() != null) {
+            if (_compound.getChemicalStructure().lastIndexOf("/") != -1) {
+                // 文件名
+                String chemicalStructureFilename = _compound.getChemicalStructure().substring(_compound.getChemicalStructure().lastIndexOf("/"));
+                File oldChemicalStructure = new File(localImgPath + "chemical structure/" + chemicalStructureFilename);
+                // 删除原文件成功
+                assert !oldChemicalStructure.exists() || oldChemicalStructure.delete();
+            }
+        }
+    }
+
+
+    public boolean delete(Integer id){
         Compound compound=compoundMapper.selectById(id);
         try {
-            if(compound.getChemicalStructure().lastIndexOf("/")!=-1) {
-                String chemicalStructureFilename = compound.getChemicalStructure().substring(compound.getChemicalStructure().lastIndexOf("/"));
-                File oldChemicalStructure = new File(localImgPath+"chemical structure/" + chemicalStructureFilename);
-                if (oldChemicalStructure.exists())
-                    oldChemicalStructure.delete();
-            }
-            if(compound.getMassSpectrogram().lastIndexOf("/")!=-1) {
-                String massSpectrogramFilename = compound.getMassSpectrogram().substring(compound.getMassSpectrogram().lastIndexOf("/"));
-                File oldMassSpectrogram = new File(localImgPath+"Orbitrap-MS mass spectrometry/" + massSpectrogramFilename);
-                if (oldMassSpectrogram.exists())
-                    oldMassSpectrogram.delete();
-            }
-
-            if(compound.getMassSpectrogramNist().lastIndexOf("/")!=-1) {
-                String massSpectrogramNistFilename = compound.getMassSpectrogramNist().substring(compound.getMassSpectrogramNist().lastIndexOf("/"));
-                File oldMassSpectrogramNist = new File(localImgPath+"Low-resolution mass spectrometry/" + massSpectrogramNistFilename);
-                if (oldMassSpectrogramNist.exists())
-                    oldMassSpectrogramNist.delete();
-            }
+            delChemicalStructure(compound);
+            delMassSpectrogram(compound);
+            delMassSpectrogramNist(compound);
 
             QueryWrapper<Measured> mrQueryWrapper=new QueryWrapper<>();
             mrQueryWrapper.eq("compound_id",id);

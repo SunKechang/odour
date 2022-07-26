@@ -17,9 +17,10 @@ import java.util.List;
  */
 public interface ICompoundService extends IService<Compound> {
     PageResult searchList(SearchVo searchVo);
+    boolean delete(Integer id);
     List<Compound> getNews();
     boolean save(Compound compound);
-    boolean updateById(Compound compound);
+    boolean update(Compound compound);
     PageResult getList(SearchVo searchVo);
     Compound getOne(Integer id);
     List<Compound> dynamicSelect(List<SearchVo> searchVoList);

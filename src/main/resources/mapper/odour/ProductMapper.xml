@@ -9,6 +9,6 @@
         <result column="product_picture" property="productPicture"/>
     </resultMap>
     <select id="selectAll" resultMap="ProductMap">
-        SELECT * FROM product;
+        SELECT * FROM product
     </select>
 </mapper>

@@ -12,7 +12,6 @@ import com.bjfu.li.odour.service.impl.LogServiceImpl;
 import com.bjfu.li.odour.utils.Excel;
 import com.bjfu.li.odour.utils.ExcelUtils;
 import com.bjfu.li.odour.utils.PageResult;
-import com.bjfu.li.odour.utils.ProExcel;
 import com.bjfu.li.odour.vo.NewsVo;
 import com.bjfu.li.odour.vo.SearchVo;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -68,36 +66,14 @@ public class CompoundController {
         Excel.createExcelFile(response,compounds);
         return SverResponse.createRespBySuccess();
     }
-
-
-    @PostMapping("/downloadpro")
-    public void downloadProCompounds(@RequestBody  Map<String,List<String>> dataMap,HttpServletResponse response) {
-        System.out.println(dataMap);
-        List<Compound> compounds=new ArrayList<>();
-        List<String> needSheet = dataMap.get("check");
-
-        for(int i=0;i<dataMap.get("cas").size();i++) {
-//           List<Compound> compound = compoundService.searchByCasPro(dataMap.get("cas").get(i));
-//           if(compound.isEmpty()){
-//                continue;
-//            }
-//           else {
-//            compounds.add(compound.get(0));
-//           }
-        }
-        ProExcel.createExcelFile(response,compounds,needSheet);
-    }
-
     /**
      *
      * @param compound 化合物信息
-     * @param request
+     * @param request request
      * @return success or error
      */
     @PostMapping("/add")
     public SverResponse<String> addCompound(@RequestBody Compound compound, HttpServletRequest request){
-        System.out.println(compound.getChemicalStructure());
-        System.out.println(compound.getChemicalStructure());
         if(compoundService.save(compound)) {
             String token= request.getHeader("Authorization");
             DecodedJWT verify=JWTUtils.verify(token);
@@ -113,13 +89,13 @@ public class CompoundController {
     /**
      *
      * @param id 化合物Id
-     * @param request
+     * @param request request
      * @return success or error
      */
 
     @DeleteMapping("/delete/{id}")
     public SverResponse<String> deleteCompound(@PathVariable Integer id, HttpServletRequest request){
-        if(compoundService.removeById(id)){
+        if(compoundService.delete(id)){
             String token= request.getHeader("Authorization");
             DecodedJWT verify=JWTUtils.verify(token);
             Integer adminId=Integer.valueOf(verify.getClaim("id").asString());
@@ -133,15 +109,13 @@ public class CompoundController {
     /**
      *
      * @param compound 更新后的化合物信息
-     * @param request
+     * @param request request
      * @return success or error
      */
 
     @PostMapping("/update")
     public SverResponse<String> updateCompound(@RequestBody Compound compound,HttpServletRequest request){
-        System.out.println(compound.getChemicalStructure());
-        System.out.println(compound.getChemicalStructure());
-        if(compoundService.updateById(compound)){
+        if(compoundService.update(compound)){
             String token= request.getHeader("Authorization");
             DecodedJWT verify=JWTUtils.verify(token);
             Integer adminId=Integer.valueOf(verify.getClaim("id").asString());
@@ -207,7 +181,7 @@ public class CompoundController {
         out.flush();
         out.close();
         List<Measured> mrList= ExcelUtils.readXls(uploadPath);
-        file.delete();
+        assert  file.delete();
         return SverResponse.createRespBySuccess(mrList);
     }
 
@@ -217,15 +191,13 @@ public class CompoundController {
     public SverResponse<List<LowMeasured>> readLMRExcel(@RequestParam MultipartFile lmrExcel) throws IOException {
         String fileName = lmrExcel.getOriginalFilename();
         String uploadPath = System.getProperty("user.dir")+"/"+fileName;
-
         File file = new File(uploadPath);
         FileOutputStream out = new FileOutputStream(uploadPath);
         out.write(lmrExcel.getBytes());
         out.flush();
         out.close();
         List<LowMeasured> lmrList= ExcelUtils.readXls1(uploadPath);
-        file.delete();
-
+        assert  file.delete();
         return SverResponse.createRespBySuccess(lmrList);
     }
 }

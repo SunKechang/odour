@@ -36,17 +36,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/team/news")
                 .excludePathPatterns("/city/citySN")
                 .excludePathPatterns("/compound/{id}")
-                .excludePathPatterns("/compound/downloadpro")
                 .excludePathPatterns("/oil/{id}")
                 .excludePathPatterns("/static/**");
-
-
-
-
     }
-
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        registry.addResourceHandler("/img/**").addResourceLocations("file:" + localImgPath);
-//    }
 }
