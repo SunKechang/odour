@@ -5,35 +5,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-//@Configuration
-//public class InterceptorConfig implements WebMvcConfigurer {
-//
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry){
-//        registry.addInterceptor(new JWTInterceptor())
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/admin/login")
-//                .excludePathPatterns("/user/register")
-//                .excludePathPatterns("/user/register1")
-//                .excludePathPatterns("/compound/news")
-//                .excludePathPatterns("/compound/all")
-//                .excludePathPatterns("/compound/search")
-//                .excludePathPatterns("/compound/advanced")
-//                .excludePathPatterns("/team/news")
-//                .excludePathPatterns("/city/citySN")
-//                .excludePathPatterns("/compound/{id}");
-//    }
-//}
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
 
+    @Value("${localImgPath}")
+    private String localImgPath;
+
+    @Value("${staticAccessPath}")
+    private String staticAccessPath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler(staticAccessPath).addResourceLocations("file:" + localImgPath);
     }
     @Override
     public void addInterceptors(InterceptorRegistry registry)  {

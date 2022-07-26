@@ -197,18 +197,21 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
         if(chemicalStructure.startsWith("data")||massSpectrogram.startsWith("data"))
             _compound = compoundMapper.selectById(compound.getId());
         try {
-            if(!chemicalStructure.equals("")) {
-                //不是base64就说明没有更新
-                if(chemicalStructure.startsWith("data")&&_compound!=null){
-                    if(_compound.getChemicalStructure().lastIndexOf("/")!=-1) {
-                        String chemicalStructureFilename = _compound.getChemicalStructure().substring(_compound.getChemicalStructure().lastIndexOf("/"));
-                        File oldChemicalStructure = new File(localImgPath + "chemical structure/" + chemicalStructureFilename);
-                        if (oldChemicalStructure.exists())
-                            oldChemicalStructure.delete();
-                    }
-                    chemicalStructure = networkImgPath+"chemical structure/" + Base64Utils.generateImage(chemicalStructure, localImgPath+"chemical structure/");
-                    compound.setChemicalStructure(chemicalStructure);
+            // 上传了 chemicalStructure 且是一个有效的base64
+            if(!chemicalStructure.equals("") & chemicalStructure.startsWith("data")) {
+                // 数据库中该数据存在
+                assert _compound != null;
+                // 文件地址能够争取解析
+                if(_compound.getChemicalStructure().lastIndexOf("/") !=-1) {
+                    // 文件名
+                    String chemicalStructureFilename = _compound.getChemicalStructure().substring(_compound.getChemicalStructure().lastIndexOf("/"));
+                    System.out.println(chemicalStructureFilename);
+                    File oldChemicalStructure = new File(localImgPath + "chemical structure/" + chemicalStructureFilename);
+                    // 删除原文件成功
+                    assert !oldChemicalStructure.exists() || oldChemicalStructure.delete();
                 }
+                chemicalStructure = networkImgPath+"chemical structure/" + Base64Utils.generateImage(chemicalStructure, localImgPath+"chemical structure/");
+                compound.setChemicalStructure(chemicalStructure);
             }
             //逻辑和上面一样
             if(!massSpectrogram.equals("")) {

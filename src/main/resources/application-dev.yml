@@ -23,16 +23,21 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
-#localImgPath: /usr/share/nginx/resource/
-#networkImgPath: resource/
-localImgPath: E:\GitHub\Beijing Forestry University\odour\src\main\resources\static\
-networkImgPath: /static/
-rawFileDir: C:/Users/li/Desktop/nginx/resource/download/
-teamNewsDir: C:/Users/li/Desktop/nginx/resource/static/news/
-
 # pagehelper
 pagehelper:
   helperDialect: mysql
   reasonable: true
   supportMethodsArguments: true
   params: count=countSql
+
+
+# 文件上传目录
+localImgPath: E:\GitHub\Beijing Forestry University\odour\src\main\resources\static\
+# 上传的服务器上的映射文件夹
+networkImgPath: /static/
+# 静态资源对外暴露的访问路径
+staticAccessPath: /static/**
+
+
+rawFileDir: C:/Users/li/Desktop/nginx/resource/download/
+teamNewsDir: C:/Users/li/Desktop/nginx/resource/static/news/
