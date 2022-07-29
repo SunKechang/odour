@@ -126,7 +126,6 @@ public class CompoundController {
         }else
             return SverResponse.createRespByError();
     }
-
     /**
      * @return 获取所有化合物列表
      */

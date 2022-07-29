@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,6 +227,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 massSpectrogramNist = networkImgPath+"Low-resolution mass spectrometry/" + Base64Utils.generateImage(massSpectrogramNist, localImgPath+"Low-resolution mass spectrometry/");
                 compound.setMassSpectrogramNist(massSpectrogramNist);
             }
+            compound.setUpdateTime(LocalDateTime.now());
             compoundMapper.updateById(compound);
 
             // 更新ri
@@ -438,8 +440,6 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
         }
         return compoundMapper.dynamicSelect(searchVoList);
     }
-
-
     @Override
     public List<Compound> getNews() {
         return compoundMapper.selectNewsList();

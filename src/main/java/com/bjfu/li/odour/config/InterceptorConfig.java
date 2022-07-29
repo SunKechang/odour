@@ -37,6 +37,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/city/citySN")
                 .excludePathPatterns("/compound/{id}")
                 .excludePathPatterns("/oil/{id}")
+                .excludePathPatterns("/product/news")
                 .excludePathPatterns("/static/**");
     }
 }

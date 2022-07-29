@@ -9,4 +9,8 @@ import java.util.List;
 public interface IProductService {
     PageResult getList(SearchVo searchVo);
     List<Product> getAll();
+    List<Product> getNews(Integer num);
+    Product getOne(Integer id);
+    boolean save(Product product);
+
 }

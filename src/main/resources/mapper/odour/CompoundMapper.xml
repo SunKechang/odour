@@ -125,4 +125,10 @@
         LEFT JOIN product product ON product.id = pk.product_id
         WHERE product.product_name like "%"#{product}"%"  AND compound.is_deleted = 0
     </select>
+    <select id="selectNewsList" resultMap="CompoundRiMap">
+        select * from compound
+            where is_deleted=0
+            order by update_time desc
+            limit 5
+    </select>
 </mapper>

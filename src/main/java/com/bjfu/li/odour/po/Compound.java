@@ -71,7 +71,7 @@ public class Compound implements Serializable {
     private LocalDateTime createTime = LocalDateTime.now();
 
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
+    private LocalDateTime updateTime = LocalDateTime.now();
 
     @TableLogic
     private Integer isDeleted=0;

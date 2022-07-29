@@ -7,8 +7,13 @@
         <result column="product_name" property="productName" />
         <result column="product_description" property="productDescription"/>
         <result column="product_picture" property="productPicture"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
     <select id="selectAll" resultMap="ProductMap">
         SELECT * FROM product
+    </select>
+    <select id="selectTop" resultMap="ProductMap">
+        SELECT * FROM product ORDER BY update_time DESC LIMIT #{num}
     </select>
 </mapper>

@@ -3,11 +3,13 @@ package com.bjfu.li.odour.po;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -44,4 +46,14 @@ public class Product implements Serializable {
      */
     @TableField(exist = false)
     private List<ProductOdourThreshold> otList;
+    /**
+     * 添加时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime = LocalDateTime.now();
+    /**
+     * 修改时间
+     */
+    @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime = LocalDateTime.now();
 }
