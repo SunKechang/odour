@@ -67,4 +67,18 @@ public class ProductController {
         Product product = productService.getOne(id);
         return SverResponse.createRespBySuccess(product);
     }
+    @DeleteMapping("/{id}")
+    public SverResponse<String> deleteController(
+            @PathVariable Integer id, HttpServletRequest request
+    ) {
+        if(productService.delete(id)){
+            String token= request.getHeader("Authorization");
+            DecodedJWT verify=JWTUtils.verify(token);
+            Integer adminId=Integer.valueOf(verify.getClaim("id").asString());
+            Log log=new Log(null,"Delete",id,adminId, LocalDateTime.now());
+            logService.save(log);
+            return SverResponse.createRespBySuccess();
+        }else
+            return SverResponse.createRespByError();
+    }
 }

@@ -282,20 +282,24 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 lowmeasuredMapper.insert(lowmeasured);
             }
             // 更新 product
-            QueryWrapper<ProductKey> keyQueryWrapper=new QueryWrapper<>();
-            keyQueryWrapper.eq("compound_id",compound.getId());
-            productKeyMapper.delete(keyQueryWrapper);
-            QueryWrapper<ProductOdourDescription> productOdQueryWrapper=new QueryWrapper<>();
-            productOdQueryWrapper.eq("compound_id",compound.getId());
-            productOdMapper.delete(productOdQueryWrapper);
-            QueryWrapper<ProductOdourThreshold> productOtQueryWrapper=new QueryWrapper<>();
-            productOtQueryWrapper.eq("compound_id",compound.getId());
-            productOtMapper.delete(productOtQueryWrapper);
+            deleteProductInfo(compound);
             return insertProducts(compound);
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
+    }
+
+    private void deleteProductInfo(Compound compound) {
+        QueryWrapper<ProductKey> keyQueryWrapper=new QueryWrapper<>();
+        keyQueryWrapper.eq("compound_id",compound.getId());
+        productKeyMapper.delete(keyQueryWrapper);
+        QueryWrapper<ProductOdourDescription> productOdQueryWrapper=new QueryWrapper<>();
+        productOdQueryWrapper.eq("compound_id",compound.getId());
+        productOdMapper.delete(productOdQueryWrapper);
+        QueryWrapper<ProductOdourThreshold> productOtQueryWrapper=new QueryWrapper<>();
+        productOtQueryWrapper.eq("compound_id",compound.getId());
+        productOtMapper.delete(productOtQueryWrapper);
     }
 
     private void delMassSpectrogramNist(Compound _compound) {
@@ -362,6 +366,8 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             otQueryWrapper.eq("compound_id",id);
             otMapper.delete(otQueryWrapper);
             compoundMapper.deleteById(id);
+
+            deleteProductInfo(compound);
             return true;
         }catch (Exception e){
             e.printStackTrace();

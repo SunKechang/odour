@@ -11,6 +11,7 @@ public interface IProductService {
     List<Product> getAll();
     List<Product> getNews(Integer num);
     Product getOne(Integer id);
+    boolean delete(Integer id);
     boolean save(Product product);
 
 }

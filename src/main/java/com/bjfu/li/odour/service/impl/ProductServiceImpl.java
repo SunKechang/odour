@@ -1,8 +1,15 @@
 package com.bjfu.li.odour.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bjfu.li.odour.mapper.ProductKeyMapper;
 import com.bjfu.li.odour.mapper.ProductMapper;
+import com.bjfu.li.odour.mapper.ProductOdourDescriptionMapper;
+import com.bjfu.li.odour.mapper.ProductOdourThresholdMapper;
 import com.bjfu.li.odour.po.Product;
+import com.bjfu.li.odour.po.ProductKey;
+import com.bjfu.li.odour.po.ProductOdourDescription;
+import com.bjfu.li.odour.po.ProductOdourThreshold;
 import com.bjfu.li.odour.service.IProductService;
 import com.bjfu.li.odour.utils.Base64Utils;
 import com.bjfu.li.odour.utils.PageResult;
@@ -21,6 +28,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Resource
     ProductMapper productMapper;
+    @Resource
+    ProductKeyMapper productKeyMapper;
+    @Resource
+    ProductOdourThresholdMapper productOtMapper;
+    @Resource
+    ProductOdourDescriptionMapper productOdMapper;
     @Value("${localImgPath}")
     String localImgPath;
     @Value("${networkImgPath}")
@@ -49,6 +62,23 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Override
     public Product getOne(Integer id) {
         return productMapper.selectById(id);
+    }
+
+    @Override
+    public boolean delete(Integer id) {
+        // product
+        Product product = productMapper.selectById(id);
+        QueryWrapper<ProductKey> keyQueryWrapper=new QueryWrapper<>();
+        keyQueryWrapper.eq("product_id",product.getId());
+        productKeyMapper.delete(keyQueryWrapper);
+        QueryWrapper<ProductOdourDescription> productOdQueryWrapper=new QueryWrapper<>();
+        productOdQueryWrapper.eq("product_id",product.getId());
+        productOdMapper.delete(productOdQueryWrapper);
+        QueryWrapper<ProductOdourThreshold> productOtQueryWrapper=new QueryWrapper<>();
+        productOtQueryWrapper.eq("product_id",product.getId());
+        productOtMapper.delete(productOtQueryWrapper);
+        productMapper.deleteById(id);
+        return false;
     }
 
     @Override

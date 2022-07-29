@@ -94,7 +94,9 @@ public class CompoundController {
      */
 
     @DeleteMapping("/delete/{id}")
-    public SverResponse<String> deleteCompound(@PathVariable Integer id, HttpServletRequest request){
+    public SverResponse<String> deleteCompound(
+            @PathVariable Integer id, HttpServletRequest request
+    ){
         if(compoundService.delete(id)){
             String token= request.getHeader("Authorization");
             DecodedJWT verify=JWTUtils.verify(token);
