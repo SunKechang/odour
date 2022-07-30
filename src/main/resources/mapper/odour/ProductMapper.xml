@@ -17,7 +17,7 @@
         SELECT * FROM product ORDER BY update_time DESC LIMIT #{num}
     </select>
     <select id="dynamicSelect" resultType="com.bjfu.li.odour.po.Product">
-        SELECT * FROM product product
+        SELECT * FROM product
         <where>
             <foreach collection="list" index="index" item="searchVo" open=" " separator=" " close=" ">
                 <if test="searchVo.searchRule == 'equal'">

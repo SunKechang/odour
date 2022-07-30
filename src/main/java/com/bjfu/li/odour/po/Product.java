@@ -47,6 +47,11 @@ public class Product implements Serializable {
     @TableField(exist = false)
     private List<ProductOdourThreshold> otList;
     /**
+     * 产品化合物
+     */
+    @TableField(exist = false)
+    private List<Compound> compoundList;
+    /**
      * 添加时间
      */
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")

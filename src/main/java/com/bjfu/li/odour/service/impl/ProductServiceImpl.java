@@ -2,10 +2,7 @@ package com.bjfu.li.odour.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.bjfu.li.odour.mapper.ProductKeyMapper;
-import com.bjfu.li.odour.mapper.ProductMapper;
-import com.bjfu.li.odour.mapper.ProductOdourDescriptionMapper;
-import com.bjfu.li.odour.mapper.ProductOdourThresholdMapper;
+import com.bjfu.li.odour.mapper.*;
 import com.bjfu.li.odour.po.*;
 import com.bjfu.li.odour.service.IProductService;
 import com.bjfu.li.odour.utils.Base64Utils;
@@ -33,6 +30,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     ProductKeyMapper productKeyMapper;
     @Resource
     ProductOdourThresholdMapper productOtMapper;
+    @Resource
+    CompoundMapper compoundMapper;
     @Resource
     ProductOdourDescriptionMapper productOdMapper;
     @Value("${localImgPath}")
@@ -88,7 +87,23 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     public Product getOne(Integer id) {
-        return productMapper.selectById(id);
+        Product product = productMapper.selectById(id);
+        QueryWrapper<ProductKey> keyQueryWrapper=new QueryWrapper<>();
+        keyQueryWrapper.eq("product_id",product.getId());
+        List<ProductKey> productKeyList = productKeyMapper.selectList(keyQueryWrapper);
+        List<Compound> compoundList = new ArrayList<>();
+        for (ProductKey productKey : productKeyList) {
+            QueryWrapper<Compound> compoundQueryWrapper = new QueryWrapper<>();
+            compoundQueryWrapper.eq("id", productKey.getCompoundId());
+            compoundList.addAll(compoundMapper.selectList(compoundQueryWrapper));
+
+
+            QueryWrapper<ProductOdourDescription> productOdQueryWrapper=new QueryWrapper<>();
+            productOdQueryWrapper.eq("product_id",product.getId());
+            productOdMapper.selectList(productOdQueryWrapper);
+        }
+        product.setCompoundList(compoundList);
+        return product;
     }
 
     @Override
