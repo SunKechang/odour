@@ -3,6 +3,7 @@ package com.bjfu.li.odour.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.bjfu.li.odour.common.pojo.SverResponse;
 import com.bjfu.li.odour.common.token.JWTUtils;
+import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.po.Log;
 import com.bjfu.li.odour.po.Product;
 import com.bjfu.li.odour.service.IProductService;
@@ -76,6 +77,29 @@ public class ProductController {
             DecodedJWT verify=JWTUtils.verify(token);
             Integer adminId=Integer.valueOf(verify.getClaim("id").asString());
             Log log=new Log(null,"Delete",id,adminId, LocalDateTime.now());
+            logService.save(log);
+            return SverResponse.createRespBySuccess();
+        }else
+            return SverResponse.createRespByError();
+    }
+    /**
+     *
+     * @param product 更新后的产品信息
+     * @param request request
+     * @return success or error
+     */
+
+    @PostMapping("/update")
+    public SverResponse<String> updateCompound(
+            @RequestBody Product product,
+            HttpServletRequest request
+    ){
+        if(productService.update(product)){
+            String token= request.getHeader("Authorization");
+            DecodedJWT verify=JWTUtils.verify(token);
+            Integer adminId=Integer.valueOf(verify.getClaim("id").asString());
+            Log log=new Log(null,"Update",product.getId(),adminId, LocalDateTime.now());
+
             logService.save(log);
             return SverResponse.createRespBySuccess();
         }else

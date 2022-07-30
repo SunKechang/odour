@@ -6,10 +6,7 @@ import com.bjfu.li.odour.mapper.ProductKeyMapper;
 import com.bjfu.li.odour.mapper.ProductMapper;
 import com.bjfu.li.odour.mapper.ProductOdourDescriptionMapper;
 import com.bjfu.li.odour.mapper.ProductOdourThresholdMapper;
-import com.bjfu.li.odour.po.Product;
-import com.bjfu.li.odour.po.ProductKey;
-import com.bjfu.li.odour.po.ProductOdourDescription;
-import com.bjfu.li.odour.po.ProductOdourThreshold;
+import com.bjfu.li.odour.po.*;
 import com.bjfu.li.odour.service.IProductService;
 import com.bjfu.li.odour.utils.Base64Utils;
 import com.bjfu.li.odour.utils.PageResult;
@@ -21,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -96,5 +95,37 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public boolean update(Product product) {
+        String productPicture = product.getProductPicture() == null ? "" : product.getProductPicture();
+        Product _product= new Product();
+        if(productPicture.startsWith("data")){
+            _product = productMapper.selectById(product.getId());
+        }
+        try {
+            // 上传了 productPicture 且是一个有效的base64
+            if(!productPicture.equals("") & productPicture.startsWith("data")) {
+                // 数据库中该数据存在
+                assert _product != null;
+                // 文件地址存在且能够争取解析
+                if(_product.getProductPicture() != null) {
+                    if (_product.getProductPicture().lastIndexOf("/") != -1) {
+                        // 文件名
+                        String productPictureFileName = _product.getProductPicture().substring(_product.getProductPicture().lastIndexOf("/"));
+                        File oldPictureFileName = new File(localImgPath + "product picture/" + productPictureFileName);
+                        // 删除原文件成功
+                        assert !oldPictureFileName.exists() || oldPictureFileName.delete();
+                    }
+                }
+            }
+            product.setUpdateTime(LocalDateTime.now());
+            productMapper.updateById(product);
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return false;
     }
 }

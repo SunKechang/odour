@@ -1,5 +1,6 @@
 package com.bjfu.li.odour.service;
 
+import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.po.Product;
 import com.bjfu.li.odour.utils.PageResult;
 import com.bjfu.li.odour.vo.SearchVo;
@@ -13,5 +14,6 @@ public interface IProductService {
     Product getOne(Integer id);
     boolean delete(Integer id);
     boolean save(Product product);
+    boolean update(Product product);
 
 }
