@@ -114,7 +114,6 @@ public class CompoundController {
      * @param request request
      * @return success or error
      */
-
     @PostMapping("/update")
     public SverResponse<String> updateCompound(@RequestBody Compound compound,HttpServletRequest request){
         if(compoundService.update(compound)){

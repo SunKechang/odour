@@ -3,7 +3,6 @@ package com.bjfu.li.odour.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.bjfu.li.odour.common.pojo.SverResponse;
 import com.bjfu.li.odour.common.token.JWTUtils;
-import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.po.Log;
 import com.bjfu.li.odour.po.Product;
 import com.bjfu.li.odour.service.IProductService;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +35,18 @@ public class ProductController {
         PageResult products = productService.getList(searchVo);
         return SverResponse.createRespBySuccess(products);
     }
-
+    /**
+     *
+     * @param searchVo 查询条件
+     * @return 搜索结果
+     */
+    @PostMapping("/search")
+    public SverResponse<PageResult> searchProducts(
+            @RequestBody SearchVo searchVo
+    ){
+        PageResult pageResult = productService.searchList(searchVo);
+        return SverResponse.createRespBySuccess(pageResult);
+    }
     @GetMapping("/all")
     public SverResponse<List<Product>> getProductList(){
         List<Product> products = productService.getAll();
@@ -89,7 +100,7 @@ public class ProductController {
      * @return success or error
      */
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public SverResponse<String> updateCompound(
             @RequestBody Product product,
             HttpServletRequest request
@@ -104,5 +115,13 @@ public class ProductController {
             return SverResponse.createRespBySuccess();
         }else
             return SverResponse.createRespByError();
+    }
+    @PostMapping("/download")
+    public SverResponse<List<Product>> downloadCompounds(
+            @RequestBody List<Product> products,
+            HttpServletResponse response
+    ) {
+//        Excel.createExcelFile(response,products);
+        return SverResponse.createRespBySuccess();
     }
 }

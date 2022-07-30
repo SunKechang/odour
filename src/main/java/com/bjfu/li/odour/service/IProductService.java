@@ -8,6 +8,7 @@ import com.bjfu.li.odour.vo.SearchVo;
 import java.util.List;
 
 public interface IProductService {
+    PageResult searchList(SearchVo searchVo);
     PageResult getList(SearchVo searchVo);
     List<Product> getAll();
     List<Product> getNews(Integer num);
@@ -15,5 +16,5 @@ public interface IProductService {
     boolean delete(Integer id);
     boolean save(Product product);
     boolean update(Product product);
-
+    List<Product> dynamicSelect(List<SearchVo> searchVoList);
 }

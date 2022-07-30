@@ -14,12 +14,14 @@ import com.bjfu.li.odour.utils.PageUtil;
 import com.bjfu.li.odour.vo.SearchVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,6 +41,32 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     String networkImgPath;
 
 
+    @Override
+    public PageResult searchList(SearchVo searchVo) {
+        String propertyDescription = searchVo.getSearchValue().toString().trim();
+        String property = searchVo.getSearchProperty();
+        searchVo.setSearchRule("like");
+        searchVo.setSearchValue(propertyDescription);
+        searchVo.setSearchProperty(property);
+        List<SearchVo> searchVoList = new ArrayList<>();
+        searchVoList.add(searchVo);
+        List<Product> productList = this.dynamicSelect(searchVoList);
+        PageHelper.startPage(searchVo.getPage(), searchVo.getSize());
+        PageInfo<Product> pageInfo = new PageInfo<>(productList);
+        return PageUtil.getPageResult(pageInfo);
+    }
+    @Override
+    public List<Product> dynamicSelect(List<SearchVo> searchVoList) {
+        //为了测试连表和前后端字段名不一致，可省略
+        for (SearchVo searchVo : searchVoList) {
+            if (StringUtils.equalsIgnoreCase("id", searchVo.getSearchProperty())){
+                searchVo.setSearchProperty("product.id");
+            }else if (StringUtils.equalsIgnoreCase("product_name", searchVo.getSearchProperty())) {
+                searchVo.setSearchProperty("product.product_name");
+            }
+        }
+        return productMapper.dynamicSelect(searchVoList);
+    }
     @Override
     public PageResult getList(SearchVo searchVo) {
         System.out.println(searchVo);
@@ -119,13 +147,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                         assert !oldPictureFileName.exists() || oldPictureFileName.delete();
                     }
                 }
+                // 保存新的文件并更新字段
+                productPicture = networkImgPath + "product picture/" + Base64Utils.generateImage(productPicture, localImgPath+"product picture/");
+                product.setProductPicture(productPicture);
             }
             product.setUpdateTime(LocalDateTime.now());
             productMapper.updateById(product);
+            return true;
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
-        return false;
     }
 }
