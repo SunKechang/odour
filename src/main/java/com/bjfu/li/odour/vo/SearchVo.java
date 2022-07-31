@@ -9,6 +9,7 @@ public class SearchVo {
     private Object searchValue;
     private Integer page;
     private Integer size;
+    private Integer productId;
 
     @Override
     public String toString() {
