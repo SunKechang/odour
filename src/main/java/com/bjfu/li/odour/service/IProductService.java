@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface IProductService {
     PageResult searchList(SearchVo searchVo);
+    List<Compound> searchCompound(SearchVo searchVo);
     PageResult getList(SearchVo searchVo);
     List<Product> getAll();
     List<Product> getNews(Integer num);

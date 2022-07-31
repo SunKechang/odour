@@ -3,6 +3,7 @@ package com.bjfu.li.odour.controller;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.bjfu.li.odour.common.pojo.SverResponse;
 import com.bjfu.li.odour.common.token.JWTUtils;
+import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.po.Log;
 import com.bjfu.li.odour.po.Product;
 import com.bjfu.li.odour.service.IProductService;
@@ -123,5 +124,12 @@ public class ProductController {
     ) {
 //        Excel.createExcelFile(response,products);
         return SverResponse.createRespBySuccess();
+    }
+    @PostMapping("/searchcompound")
+    public SverResponse<List<Compound>> downloadCompounds(
+            @RequestBody SearchVo searchVo
+    ) {
+        List<Compound> list = productService.searchCompound(searchVo);
+
     }
 }

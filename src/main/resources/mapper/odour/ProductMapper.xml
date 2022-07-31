@@ -35,4 +35,12 @@
             </foreach>
         </where>
     </select>
+    <select id="selectCompound" resultType="com.bjfu.li.odour.po.Compound">
+        SELECT compound.*
+        FROM compound
+                 LEFT JOIN product_key pk on compound.id = pk.compound_id
+                 LEFT JOIN product p on pk.product_id = p.id
+        WHERE p.id = #{searchVo.productId}
+          AND ${searchVo.searchProperty} like CONCAT('%', #{searchVo.searchValue}, '%')
+    </select>
 </mapper>

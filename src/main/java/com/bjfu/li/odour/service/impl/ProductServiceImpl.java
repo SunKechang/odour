@@ -54,6 +54,22 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         PageInfo<Product> pageInfo = new PageInfo<>(productList);
         return PageUtil.getPageResult(pageInfo);
     }
+
+    @Override
+    public List<Compound> searchCompound(SearchVo searchVo) {
+        String propertyDescription = searchVo.getSearchValue().toString().trim();
+        String property = searchVo.getSearchProperty();
+        searchVo.setSearchRule("like");
+        searchVo.setSearchValue(propertyDescription);
+        searchVo.setSearchProperty(property);
+        List<SearchVo> searchVoList = new ArrayList<>();
+        searchVoList.add(searchVo);
+
+        List<Compound> compoundList = new ArrayList<>();
+
+        return null;
+    }
+
     @Override
     public List<Product> dynamicSelect(List<SearchVo> searchVoList) {
         //为了测试连表和前后端字段名不一致，可省略
