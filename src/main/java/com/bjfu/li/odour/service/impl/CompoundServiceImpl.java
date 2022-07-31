@@ -66,6 +66,11 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     @Value("${networkImgPath}")
     String networkImgPath;
     @Override
+    public List<Compound> searchByCasPro(String cas){
+        cas=cas.replaceAll("-","");
+        return compoundMapper.selectByCasPro(cas);
+    }
+    @Override
     public List<Compound> advancedSearch(Map<String, String> properties) {
         return compoundMapper.advancedSearch(properties);
     }

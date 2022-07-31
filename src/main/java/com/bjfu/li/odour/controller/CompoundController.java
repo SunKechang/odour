@@ -12,8 +12,13 @@ import com.bjfu.li.odour.service.impl.LogServiceImpl;
 import com.bjfu.li.odour.utils.Excel;
 import com.bjfu.li.odour.utils.ExcelUtils;
 import com.bjfu.li.odour.utils.PageResult;
+import com.bjfu.li.odour.utils.ProExcel;
 import com.bjfu.li.odour.vo.NewsVo;
 import com.bjfu.li.odour.vo.SearchVo;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -191,8 +198,6 @@ public class CompoundController {
         return SverResponse.createRespBySuccess(mrList);
     }
 
-
-
     @PostMapping("/lowmr")
     public SverResponse<List<LowMeasured>> readLMRExcel(@RequestParam MultipartFile lmrExcel) throws IOException {
         String fileName = lmrExcel.getOriginalFilename();
@@ -205,5 +210,34 @@ public class CompoundController {
         List<LowMeasured> lmrList= ExcelUtils.readXls1(uploadPath);
         assert  file.delete();
         return SverResponse.createRespBySuccess(lmrList);
+    }
+    @GetMapping(value = "/downloadTemplate", produces = "application/ms-excel")
+    public ResponseEntity<byte[]> downloadTemplate() throws IOException {
+        ClassPathResource resource = new ClassPathResource(File.separator + "templates" + File.separator + "CAS上传模板.xlsx");
+        InputStream inputStream = resource.getInputStream();
+        byte[] body = new byte[inputStream.available()];
+        //noinspection ResultOfMethodCallIgnored
+        inputStream.read(body);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=" + URLEncoder.encode("CAS上传模板.xlsx", "utf-8"));
+        HttpStatus status = HttpStatus.OK;
+        return new ResponseEntity<>(body, headers, status);
+    }
+
+    @PostMapping("/downloadpro")
+    public void downloadProCompounds(@RequestBody  Map<String,List<String>> dataMap,HttpServletResponse response) {
+        System.out.println(dataMap);
+        List<Compound> compounds=new ArrayList<>();
+        List<String> needSheet = dataMap.get("check");
+
+        for(int i=0;i<dataMap.get("cas").size();i++) {
+            List<Compound> compound = compoundService.searchByCasPro(dataMap.get("cas").get(i));
+            if(!compound.isEmpty()){
+                compounds.add(compound.get(0));
+            }
+        }
+        System.out.println(compounds.get(1));
+        System.out.println(compounds.get(1).getCasNo());
+        ProExcel.createExcelFile(response,compounds,needSheet);
     }
 }

@@ -17,6 +17,8 @@ import java.util.Map;
  * @since 2020-11-06
  */
 public interface ICompoundService extends IService<Compound> {
+    List<Compound> searchByCasPro(String cas);
+
     List<Compound> advancedSearch(Map<String, String> properties);
 
     PageResult searchList(SearchVo searchVo);

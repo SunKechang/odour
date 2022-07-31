@@ -29,4 +29,5 @@ public interface CompoundMapper extends BaseMapper<Compound> {
     List<Compound> selectByLowMeasured(@Param("low") double low,@Param("high") double high);
     List<Compound> selectByProduct(@Param(("product")) String product);
     List<Compound> advancedSearch(@Param("map") Map<String, String> properties);
+    List<Compound> selectByCasPro(String params);
 }
