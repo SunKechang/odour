@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -38,15 +39,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/compound")
 public class CompoundController {
-
-
     @Resource
     LogServiceImpl logService;
-
     @Resource
     ICompoundService compoundService;
     /**
      *
+     * @param properties 多个属性及其描述
+     * @return 搜索结果
+     */
+    @PostMapping("/advanced")
+    public SverResponse<List<Compound>> advancedSearch(@RequestParam Map<String,String> properties){
+        List<Compound> compounds=compoundService.advancedSearch(properties);
+        return SverResponse.createRespBySuccess(compounds);
+    }
+    /**
      * @param searchVo 查询条件
      * @return 搜索结果
      */
@@ -57,7 +64,6 @@ public class CompoundController {
         PageResult pageResult = compoundService.searchList(searchVo);
         return SverResponse.createRespBySuccess(pageResult);
     }
-
     @PostMapping("/download")
     public SverResponse<List<Compound>> downloadCompounds(
             @RequestBody List<Compound> compounds,

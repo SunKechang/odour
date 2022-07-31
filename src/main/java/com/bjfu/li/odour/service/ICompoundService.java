@@ -6,6 +6,7 @@ import com.bjfu.li.odour.utils.PageResult;
 import com.bjfu.li.odour.vo.SearchVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -16,6 +17,8 @@ import java.util.List;
  * @since 2020-11-06
  */
 public interface ICompoundService extends IService<Compound> {
+    List<Compound> advancedSearch(Map<String, String> properties);
+
     PageResult searchList(SearchVo searchVo);
     boolean delete(Integer id);
     List<Compound> getNews();

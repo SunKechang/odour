@@ -6,6 +6,7 @@ import com.bjfu.li.odour.vo.SearchVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -27,4 +28,5 @@ public interface CompoundMapper extends BaseMapper<Compound> {
     List<Compound> selectByMeasured(@Param("low") double low,@Param("high") double high);
     List<Compound> selectByLowMeasured(@Param("low") double low,@Param("high") double high);
     List<Compound> selectByProduct(@Param(("product")) String product);
+    List<Compound> advancedSearch(@Param("map") Map<String, String> properties);
 }

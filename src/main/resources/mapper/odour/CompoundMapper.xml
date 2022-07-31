@@ -4,7 +4,7 @@
 
     <resultMap id="CompoundRiMap" type="com.bjfu.li.odour.po.Compound">
         <id column="id" property="id"/>
-        <result column="compound_name" property="compoundName" />
+        <result column="compound_name" property="compoundName"/>
         <result column="synonym" property="synonym"/>
         <result column="cas_no" property="casNo"/>
         <result column="chemical_structure" property="chemicalStructure"/>
@@ -34,7 +34,7 @@
 
         <collection property="otList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.OdourThreshold">
             <id column="otrid" property="id"/>
-            <result column="ot_odour_threshold" property="odourThreshold" />
+            <result column="ot_odour_threshold" property="odourThreshold"/>
             <result column="ot_odour_base" property="odourBase"/>
             <result column="ot_odour_threshold_reference" property="odourThresholdReference"/>
             <result column="ot_compound_id" property="compoundId"/>
@@ -65,10 +65,12 @@
     <select id="selectOne" resultMap="CompoundRiMap">
         SELECT c.*
         FROM compound AS c
-        WHERE c.id=#{id};
+        WHERE c.id = #{id};
     </select>
     <select id="selectAll" resultMap="CompoundRiMap">
-        SELECT * FROM compound WHERE is_deleted = 0
+        SELECT *
+        FROM compound
+        WHERE is_deleted = 0
     </select>
     <select id="dynamicSelect" resultMap="CompoundRiMap">
         SELECT * FROM compound compound
@@ -89,46 +91,171 @@
             </foreach>
         </where>
     </select>
-    <select id="selectByOdourDescription" resultMap="CompoundRiMap" >
-        SELECT * FROM compound compound
-        LEFT JOIN odour_description od ON od.compound_id = compound.id
+    <select id="selectByOdourDescription" resultMap="CompoundRiMap">
+        SELECT compound.id,
+               compound.compound_name,
+               compound.synonym,
+               compound.cas_no,
+               compound.is_deleted,
+               compound.update_time
+        FROM compound
+                 LEFT JOIN odour_description od ON od.compound_id = compound.id
         WHERE od.odour_description like "%"#{description}"%" AND compound.is_deleted = 0
+        GROUP BY
+            compound.id,
+            compound.compound_name,
+            compound.synonym,
+            compound.cas_no,
+            compound.is_deleted,
+            compound.update_time
     </select>
-    <select id="selectByOdourThreshold" resultMap="CompoundRiMap" >
-        SELECT * FROM compound compound
-        LEFT JOIN odour_threshold ot ON ot.compound_id = compound.id
-        WHERE ot.odour_threshold between #{low} and #{high} AND compound.is_deleted = 0
+    <select id="selectByOdourThreshold" resultMap="CompoundRiMap">
+        SELECT compound.id,
+               compound.compound_name,
+               compound.synonym,
+               compound.cas_no,
+               compound.is_deleted,
+               compound.update_time
+        FROM compound compound
+                 LEFT JOIN odour_threshold ot ON ot.compound_id = compound.id
+        WHERE ot.odour_threshold between #{low} and #{high}
+          AND compound.is_deleted = 0
+        GROUP BY compound.id,
+                 compound.compound_name,
+                 compound.synonym,
+                 compound.cas_no,
+                 compound.is_deleted,
+                 compound.update_time
     </select>
-    <select id="selectByRi" resultMap="CompoundRiMap" >
-        SELECT * FROM compound compound
-        LEFT JOIN ri ri ON ri.compound_id = compound.id
-        WHERE ri.compound_ri between #{low} and #{high} AND compound.is_deleted = 0
+    <select id="selectByRi" resultMap="CompoundRiMap">
+        SELECT compound.id,
+               compound.compound_name,
+               compound.synonym,
+               compound.cas_no,
+               compound.is_deleted,
+               compound.update_time
+        FROM compound compound
+                 LEFT JOIN ri ri ON ri.compound_id = compound.id
+        WHERE ri.compound_ri between #{low} and #{high}
+          AND compound.is_deleted = 0
+        GROUP BY compound.id,
+                 compound.compound_name,
+                 compound.synonym,
+                 compound.cas_no,
+                 compound.is_deleted,
+                 compound.update_time
     </select>
-    <select id="selectByNri" resultMap="CompoundRiMap" >
-        SELECT * FROM compound compound
-        LEFT JOIN nri nri ON nri.compound_id = compound.id
-        WHERE nri.compound_ri between #{low} and #{high} AND compound.is_deleted = 0
+    <select id="selectByNri" resultMap="CompoundRiMap">
+        SELECT compound.id,
+               compound.compound_name,
+               compound.synonym,
+               compound.cas_no,
+               compound.is_deleted,
+               compound.update_time
+        FROM compound compound
+                 LEFT JOIN nri nri ON nri.compound_id = compound.id
+        WHERE nri.compound_ri between #{low} and #{high}
+          AND compound.is_deleted = 0
+        GROUP BY compound.id,
+                 compound.compound_name,
+                 compound.synonym,
+                 compound.cas_no,
+                 compound.is_deleted,
+                 compound.update_time
     </select>
     <select id="selectByMeasured" resultMap="CompoundRiMap">
-        SELECT * FROM compound compound
-        LEFT JOIN measured measured ON measured.compound_id = compound.id
-        WHERE measured.measured between #{low} and #{high} AND compound.is_deleted = 0
+        SELECT compound.id,
+               compound.compound_name,
+               compound.synonym,
+               compound.cas_no,
+               compound.is_deleted,
+               compound.update_time
+
+        FROM compound compound
+                 LEFT JOIN measured measured ON measured.compound_id = compound.id
+        WHERE measured.measured between #{low} and #{high}
+          AND compound.is_deleted = 0
+        GROUP BY compound.id,
+                 compound.compound_name,
+                 compound.synonym,
+                 compound.cas_no,
+                 compound.is_deleted,
+                 compound.update_time
     </select>
     <select id="selectByLowMeasured" resultMap="CompoundRiMap">
-        SELECT * FROM compound compound
-        LEFT JOIN low_measured low_measured ON low_measured.compound_id = compound.id
-        WHERE low_measured.measured between #{low} and #{high} AND compound.is_deleted = 0
+        SELECT compound.id,
+               compound.compound_name,
+               compound.synonym,
+               compound.cas_no,
+               compound.is_deleted,
+               compound.update_time
+        FROM compound compound
+                 LEFT JOIN low_measured low_measured ON low_measured.compound_id = compound.id
+        WHERE low_measured.measured between #{low} and #{high}
+          AND compound.is_deleted = 0
+        GROUP BY compound.id,
+                 compound.compound_name,
+                 compound.synonym,
+                 compound.cas_no,
+                 compound.is_deleted,
+                 compound.update_time
     </select>
     <select id="selectByProduct" resultMap="CompoundRiMap">
-        SELECT * FROM compound compound
-        LEFT JOIN product_key pk ON pk.compound_id = compound.id
-        LEFT JOIN product product ON product.id = pk.product_id
+        SELECT compound.id,
+               compound.compound_name,
+               compound.synonym,
+               compound.cas_no,
+               compound.is_deleted,
+               compound.update_time
+        FROM compound compound
+                 LEFT JOIN product_key pk ON pk.compound_id = compound.id
+                 LEFT JOIN product product ON product.id = pk.product_id
         WHERE product.product_name like "%"#{product}"%"  AND compound.is_deleted = 0
+        GROUP BY
+            compound.id,
+            compound.compound_name,
+            compound.synonym,
+            compound.cas_no,
+            compound.is_deleted,
+            compound.update_time
     </select>
     <select id="selectNewsList" resultMap="CompoundRiMap">
-        select * from compound
-            where is_deleted=0
-            order by update_time desc
-            limit 5
+        select *
+        from compound
+        where is_deleted = 0
+        order by update_time desc limit 5
+    </select>
+    <select id="advancedSearch" resultType="com.bjfu.li.odour.po.Compound">
+        SELECT * FROM compound compound
+        <foreach collection="map" item="v" index="k" separator=" ">
+            <if test="k == 'odour_description'">
+                LEFT JOIN odour_description od ON od.compound_id = compound.id
+            </if>
+            <if test="k == 'compound_ri'">
+                LEFT JOIN ri r ON r.compound_id = compound.id
+            </if>
+            <if test="k == 'measured'">
+                LEFT JOIN measured m ON m.compound_id = compound.id
+            </if>
+
+        </foreach>
+        WHERE
+        <foreach collection="map" item="v" index="k" separator="and">
+            <if test="k == 'compound_name'">
+                compound.compound_name LIKE CONCAT("%", #{v} ,"%")
+            </if>
+            <if test="k == 'cas_no'">
+                compound.cas_no LIKE CONCAT("%", #{v} ,"%")
+            </if>
+            <if test="k == 'odour_description'">
+                od.odour_description LIKE CONCAT("%", #{v} ,"%")
+            </if>
+            <if test="k == 'compound_ri'">
+                r.compound_ri between #{v}-10 and #{v}+10
+            </if>
+            <if test="k == 'measured'">
+                m.measured between #{v}-0.05 and #{v}+0.05
+            </if>
+        </foreach>
     </select>
 </mapper>

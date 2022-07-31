@@ -40,15 +40,31 @@
         </where>
     </select>
     <select id="selectCompound" resultType="com.bjfu.li.odour.po.Compound">
-        SELECT c.*
+        SELECT c.id,
+               c.compound_name,
+               c.synonym,
+               c.cas_no,
+               c.is_deleted,
+               c.update_time
         FROM product
                  LEFT JOIN product_key pk ON product.id = pk.product_id
                  LEFT JOIN compound c on c.id = pk.compound_id
         WHERE product.id = ${productId}
           AND ${searchProperty} like CONCAT('%', #{searchValue}, '%')
+        GROUP BY c.id,
+                 c.compound_name,
+                 c.synonym,
+                 c.cas_no,
+                 c.is_deleted,
+                 c.update_time
     </select>
     <select id="selectCompoundByOdourDescription" resultType="com.bjfu.li.odour.po.Compound">
-        SELECT c.*
+        SELECT c.id,
+               c.compound_name,
+               c.synonym,
+               c.cas_no,
+               c.is_deleted,
+               c.update_time
         FROM product
                  LEFT JOIN product_key pk ON product.id = pk.product_id
                  LEFT JOIN compound c on c.id = pk.compound_id
@@ -56,9 +72,20 @@
         WHERE product.id = #{productId}
           AND od.odour_description LIKE CONCAT('%', #{odourDescription}, '%')
           AND c.is_deleted = 0
+        GROUP BY c.id,
+                 c.compound_name,
+                 c.synonym,
+                 c.cas_no,
+                 c.is_deleted,
+                 c.update_time
     </select>
     <select id="selectCompoundByOdourThreshold" resultType="com.bjfu.li.odour.po.Compound">
-        SELECT c.*
+        SELECT c.id,
+               c.compound_name,
+               c.synonym,
+               c.cas_no,
+               c.is_deleted,
+               c.update_time
         FROM product
                  LEFT JOIN product_key pk ON product.id = pk.product_id
                  LEFT JOIN compound c on c.id = pk.compound_id
@@ -66,9 +93,20 @@
         WHERE product.id = #{productId}
           AND ot.odour_threshold between #{low} and #{high}
           AND c.is_deleted = 0
+        GROUP BY c.id,
+                 c.compound_name,
+                 c.synonym,
+                 c.cas_no,
+                 c.is_deleted,
+                 c.update_time
     </select>
     <select id="selectCompoundByRi" resultType="com.bjfu.li.odour.po.Compound">
-        SELECT c.*
+        SELECT c.id,
+               c.compound_name,
+               c.synonym,
+               c.cas_no,
+               c.is_deleted,
+               c.update_time
         FROM product
                  LEFT JOIN product_key pk ON product.id = pk.product_id
                  LEFT JOIN compound c on c.id = pk.compound_id
@@ -76,9 +114,20 @@
         WHERE product.id = #{productId}
           AND r.compound_ri between #{low} and #{high}
           AND c.is_deleted = 0
+        GROUP BY c.id,
+                 c.compound_name,
+                 c.synonym,
+                 c.cas_no,
+                 c.is_deleted,
+                 c.update_time
     </select>
     <select id="selectCompoundByNri" resultType="com.bjfu.li.odour.po.Compound">
-        SELECT c.*
+        SELECT c.id,
+               c.compound_name,
+               c.synonym,
+               c.cas_no,
+               c.is_deleted,
+               c.update_time
         FROM product
                  LEFT JOIN product_key pk ON product.id = pk.product_id
                  LEFT JOIN compound c on c.id = pk.compound_id
@@ -86,9 +135,20 @@
         WHERE product.id = #{productId}
           AND r.compound_nri between #{low} and #{high}
           AND c.is_deleted = 0
+        GROUP BY c.id,
+                 c.compound_name,
+                 c.synonym,
+                 c.cas_no,
+                 c.is_deleted,
+                 c.update_time
     </select>
     <select id="selectCompoundByMeasured" resultType="com.bjfu.li.odour.po.Compound">
-        SELECT c.*
+        SELECT c.id,
+               c.compound_name,
+               c.synonym,
+               c.cas_no,
+               c.is_deleted,
+               c.update_time
         FROM product
                  LEFT JOIN product_key pk ON product.id = pk.product_id
                  LEFT JOIN compound c on c.id = pk.compound_id
@@ -96,9 +156,20 @@
         WHERE product.id = #{productId}
           AND m.measured between #{low} and #{high}
           AND c.is_deleted = 0
+        GROUP BY c.id,
+                 c.compound_name,
+                 c.synonym,
+                 c.cas_no,
+                 c.is_deleted,
+                 c.update_time
     </select>
     <select id="selectCompoundByLowMeasured" resultType="com.bjfu.li.odour.po.Compound">
-        SELECT c.*
+        SELECT c.id,
+               c.compound_name,
+               c.synonym,
+               c.cas_no,
+               c.is_deleted,
+               c.update_time
         FROM product
                  LEFT JOIN product_key pk ON product.id = pk.product_id
                  LEFT JOIN compound c on c.id = pk.compound_id
@@ -106,6 +177,12 @@
         WHERE product.id = #{productId}
           AND lm.measured between #{low} and #{high}
           AND c.is_deleted = 0
+        GROUP BY c.id,
+                 c.compound_name,
+                 c.synonym,
+                 c.cas_no,
+                 c.is_deleted,
+                 c.update_time
     </select>
 
 </mapper>

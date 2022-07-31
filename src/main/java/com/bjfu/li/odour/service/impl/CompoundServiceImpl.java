@@ -20,6 +20,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -64,7 +65,10 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     String localImgPath;
     @Value("${networkImgPath}")
     String networkImgPath;
-
+    @Override
+    public List<Compound> advancedSearch(Map<String, String> properties) {
+        return compoundMapper.advancedSearch(properties);
+    }
     @Override
     public PageResult searchList(SearchVo searchVo) {
         String propertyDescription = searchVo.getSearchValue().toString().trim();
