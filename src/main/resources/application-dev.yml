@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/odour?characterEncoding=utf-8&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: 1999331
+    password: 1999.331.Wang123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 logging:

@@ -41,4 +41,8 @@ public class ProductOdourThreshold implements Serializable {
      * 阈值来源
      */
     private String odourThresholdReference;
+    /**
+     * Base
+     */
+    private String odourThresholdBase;
 }
