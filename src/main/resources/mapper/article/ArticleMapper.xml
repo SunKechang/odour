@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjfu.li.odour.article.mapper.ArticleMapper">
+    <insert id="add" parameterType="com.bjfu.li.odour.article.po.Article">
+        insert into article
+        (name,filepath)
+        values(#{article.name}, #{article.filepath})
+    </insert>
+
+    <resultMap type="com.bjfu.li.odour.article.po.Article" id="articleMap">
+        <id property="pk" column="pk"/>
+        <result property="name" column="name"/>
+        <result property="filepath" column="filepath"/>
+    </resultMap>
+    <select id="getByPk" resultMap="articleMap">
+        SELECT *
+        FROM article a
+        WHERE a.pk = #{pk}
+    </select>
+
+    <update id="updateByPk" parameterType="com.bjfu.li.odour.article.form.UpdateForm">
+        UPDATE article
+        SET filepath = #{form.filePath}
+        WHERE pk = #{form.pk}
+    </update>
+
+    <select id="getByPk" resultMap="articleMap">
+        SELECT *
+        FROM article a
+        WHERE a.pk = #{pk}
+    </select>
+
+    <select id="searchByName" resultMap="articleMap">
+        SELECT *
+        FROM article a
+        WHERE
+        <bind name="searchName" value=" '%' + name + '%' "/>
+              a.name like #{searchName}
+    </select>
+</mapper>

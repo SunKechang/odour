@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
 @SpringBootApplication
 
 @MapperScan("com.bjfu.li.odour.mapper")
+@MapperScan("com.bjfu.li.odour.*.mapper")
 public class OdourApplication {
 
     public static void main(String[] args) {
