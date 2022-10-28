@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjfu.li.odour.admin.mapper.AdminMapper">
+    <resultMap type="com.bjfu.li.odour.admin.vo.UserView" id="userMap">
+        <id property="email" column="userEmail"/>
+        <result property="role" column="role"/>
+    </resultMap>
+    <select id="getAllUser" resultMap="userMap">
+        SELECT u.userEmail, u.role
+        FROM user u
+        WHERE 1 = 1
+        <if test="name != ''">
+            AND
+            <bind name="searchName" value=" '%' + name + '%' "/>
+                u.userEmail like #{searchName}
+        </if>
+        <if test="role != -1">
+            AND
+            u.role = #{role}
+        </if>
+    </select>
+
+    <update id="setRole" parameterType="com.bjfu.li.odour.admin.form.RoleForm">
+        UPDATE user
+        SET role = #{form.role}
+        WHERE userEmail = #{form.email}
+    </update>
+</mapper>

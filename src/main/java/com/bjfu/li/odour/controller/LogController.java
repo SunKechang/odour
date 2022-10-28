@@ -2,7 +2,6 @@ package com.bjfu.li.odour.controller;
 
 
 import com.bjfu.li.odour.common.pojo.SverResponse;
-import com.bjfu.li.odour.service.impl.AdminServiceImpl;
 import com.bjfu.li.odour.service.impl.LogServiceImpl;
 import com.bjfu.li.odour.vo.LogVo;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
 
 /**

@@ -1,13 +1,19 @@
-package com.bjfu.li.odour.controller;
+package com.bjfu.li.odour.admin.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.bjfu.li.odour.admin.form.RoleForm;
+import com.bjfu.li.odour.admin.vo.UserView;
+import com.bjfu.li.odour.article.po.Article;
 import com.bjfu.li.odour.common.pojo.SverResponse;
 import com.bjfu.li.odour.common.token.JWTUtils;
 import com.bjfu.li.odour.po.Admin;
-import com.bjfu.li.odour.service.impl.AdminServiceImpl;
+import com.bjfu.li.odour.admin.service.impl.AdminServiceImpl;
 import com.bjfu.li.odour.utils.MD5Utils;
 import com.bjfu.li.odour.vo.DownloadFileVo;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -131,5 +137,22 @@ public class AdminController {
             }
         }
         return SverResponse.createRespBySuccess(files);
+    }
+
+    @GetMapping("/user_list")
+    public SverResponse<PageInfo> getUserList(@RequestParam int pageNum, @RequestParam int pageSize,
+                                                    @RequestParam String name, @RequestParam Integer role){
+        PageInfo pageInfo;
+        Page<Article> page = PageHelper.startPage(pageNum,pageSize);
+        List<UserView> list = adminService.getUserList(name, role);
+        pageInfo = new PageInfo(list, 1);
+        PageHelper.clearPage();
+        return SverResponse.createRespBySuccess(pageInfo);
+    }
+
+    @PostMapping("/set_role")
+    public SverResponse<String> setRole(@RequestBody RoleForm form){
+        adminService.setRole(form);
+        return SverResponse.createRespBySuccess("success");
     }
 }

@@ -1,13 +1,17 @@
 package com.bjfu.li.odour.service.impl;
 
+import com.bjfu.li.odour.common.token.JWTUtils;
 import com.bjfu.li.odour.mapper.UserMapper;
 import com.bjfu.li.odour.po.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Service
@@ -15,29 +19,31 @@ public class UserService {
     @Resource
     private UserMapper userMapper;
 
-    public String selectUserEmail(User user) {
+    public String selectUserEmail(User user, HttpServletResponse response) {
         String userEmail = user.getUserEmail();
         String userPassword = user.getUserPassword();
 //        System.out.println(userEmail);
 //        System.out.println(userPassword);
 
-        String result = "-1";
+        String result;
 
         // 将输入的密码使用md5加密
         String passwordMD5 = passwordMD5(userEmail, userPassword);
-
+        User dbUser = userMapper.getByEmail(userEmail);
         // 用户不存在
-        if (userMapper.selectUserEmail(userEmail) == null) {
+        if (dbUser == null) {
             result = "0";
-            return result;
             //  用户存在，但密码输入错误
-        }else if(!userMapper.selectUserPassword(userEmail).equals(passwordMD5) ){
+        }else if(!dbUser.getUserPassword().equals(passwordMD5)){
             result = "1";
-            return result;
             //  登录成功
-        }else if(userMapper.selectUserPassword(userEmail).equals(passwordMD5)) {
+        }else {
+            Map<String, String> map = new HashMap<>();
+            map.put("role", "" + dbUser.getRole());
+            map.put("email", dbUser.getUserEmail());
+            String jwt = JWTUtils.getToken(map);
+            response.setHeader("Authorization", jwt);
             result = "2";
-            return result;
         }
         return result;
     }

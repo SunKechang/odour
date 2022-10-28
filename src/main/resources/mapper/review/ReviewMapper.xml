@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjfu.li.odour.review.mapper.ReviewMapper">
+    <resultMap id="reviewVoMap" type="com.bjfu.li.odour.review.vo.ReviewVo">
+        <result column="comment" property="comment" />
+        <result column="reviewer_id" property="reviewMail" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+    <select id="getReviewList" resultMap="reviewVoMap">
+        SELECT r.*
+        FROM review r
+        WHERE r.com_id = #{comId}
+    </select>
+</mapper>

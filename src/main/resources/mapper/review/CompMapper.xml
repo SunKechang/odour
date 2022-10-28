@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjfu.li.odour.review.mapper.CompMapper">
+    <resultMap type="com.bjfu.li.odour.review.vo.Unreview" id="unreviewedMap">
+        <id property="id" column="id"/>
+        <result column="compound_name" property="compoundName" />
+        <result column="synonym" property="synonym" />
+        <result column="cas_no" property="casNo" />
+        <result column="chemical_structure" property="chemicalStructure" />
+        <result column="mass_spectrogram" property="massSpectrogram" />
+        <result column="mass_spectrogram_nist" property="massSpectrogramNist" />
+        <result column="article" property="article" />
+    </resultMap>
+    <resultMap type="com.bjfu.li.odour.review.vo.CommitVo" id="commitMap">
+        <id property="id" column="id"/>
+        <result column="compound_name" property="compoundName" />
+        <result column="synonym" property="synonym" />
+        <result column="cas_no" property="casNo" />
+        <result column="chemical_structure" property="chemicalStructure" />
+        <result column="mass_spectrogram" property="massSpectrogram" />
+        <result column="mass_spectrogram_nist" property="massSpectrogramNist" />
+        <result column="article" property="article" />
+    </resultMap>
+    <select id="getUnreviewed" resultMap="unreviewedMap">
+        SELECT c.id, c.compound_name,c.synonym, c.cas_no, c.chemical_structure, c.mass_spectrogram, c.mass_spectrogram_nist,
+               c.article
+        FROM compound c
+        WHERE c.is_deleted = 2
+        AND c.reviewer = #{email}
+    </select>
+
+    <select id="getReviewed" resultMap="unreviewedMap">
+        SELECT c.id, c.compound_name,c.synonym, c.cas_no, c.chemical_structure, c.mass_spectrogram, c.mass_spectrogram_nist,
+               c.article
+        FROM compound c
+        WHERE (c.is_deleted = 0 OR c.is_deleted = 3)
+          AND c.reviewer = #{email}
+    </select>
+
+    <select id="getCommitted" resultMap="commitMap">
+        SELECT c.id, c.compound_name,c.synonym, c.cas_no, c.chemical_structure, c.mass_spectrogram, c.mass_spectrogram_nist,
+               c.article
+        FROM compound c
+        WHERE c.is_deleted = 2
+          AND c.uploader = #{email}
+    </select>
+
+    <select id="getMyReviewed" resultMap="commitMap">
+        SELECT c.id, c.compound_name,c.synonym, c.cas_no, c.chemical_structure, c.mass_spectrogram, c.mass_spectrogram_nist,
+               c.article
+        FROM compound c
+        WHERE (c.is_deleted = 0 OR c.is_deleted = 3)
+          AND c.uploader = #{email}
+    </select>
+
+    <update id="setRole" parameterType="com.bjfu.li.odour.admin.form.RoleForm">
+        UPDATE user
+        SET role = #{form.role}
+        WHERE userEmail = #{form.email}
+    </update>
+
+    <update id="setStatusById" parameterType="com.bjfu.li.odour.review.form.StatusForm">
+        UPDATE compound
+        SET is_deleted = #{form.status}
+        WHERE id = #{form.id}
+    </update>
+</mapper>

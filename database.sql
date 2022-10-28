@@ -2868,3 +2868,20 @@ CREATE TABLE `article` (
                         PRIMARY KEY (`pk`),
                         KEY(`name`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '文献表';
+
+ALTER TABLE `user` ADD COLUMN `role` int(1) DEFAULT 0;
+
+ALTER TABLE `compound` ADD COLUMN `article` bigint(20) DEFAULT 0;
+
+DROP TABLE IF EXISTS `review`;
+CREATE TABLE `review` (
+                           `pk` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+                           `com_id` int(11) NOT NULL ,
+                           `reviewer_id` int(11) NOT NULL,
+                           `comment` text,
+                           `create_time` datetime(0) DEFAULT CURRENT_TIMESTAMP,
+                           PRIMARY KEY (`pk`),
+                           KEY(`reviewer_id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '审批表';
+
+ALTER TABLE `review` MODIFY COLUMN `reviewer_id` varchar(255) NOT NULL ;

@@ -1,15 +1,21 @@
-package com.bjfu.li.odour.service.impl;
+package com.bjfu.li.odour.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.bjfu.li.odour.admin.form.RoleForm;
+import com.bjfu.li.odour.admin.vo.UserView;
+import com.bjfu.li.odour.mapper.UserMapper;
 import com.bjfu.li.odour.po.Admin;
-import com.bjfu.li.odour.mapper.AdminMapper;
-import com.bjfu.li.odour.service.IAdminService;
+import com.bjfu.li.odour.admin.mapper.AdminMapper;
+import com.bjfu.li.odour.admin.service.IAdminService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bjfu.li.odour.po.User;
 import com.bjfu.li.odour.utils.MD5Utils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <p>
@@ -23,6 +29,9 @@ import java.io.UnsupportedEncodingException;
 public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements IAdminService {
     @Resource
     AdminMapper adminMapper;
+
+    @Resource
+    UserMapper userMapper;
 
     public Integer loginCheck(String account, String password) throws UnsupportedEncodingException {
         QueryWrapper<Admin> queryWrapper=new QueryWrapper<>();
@@ -41,5 +50,15 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         QueryWrapper<Admin> queryWrapper=new QueryWrapper<>();
         queryWrapper.eq("is_deleted",0).eq("account",account);
         return adminMapper.selectOne(queryWrapper)==null;
+    }
+
+    @Override
+    public List<UserView> getUserList(String name, Integer role) {
+        return adminMapper.getAllUser(name, role);
+    }
+
+    @Override
+    public void setRole(RoleForm form) {
+       adminMapper.setRole(form);
     }
 }

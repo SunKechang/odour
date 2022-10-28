@@ -47,6 +47,8 @@ public class Compound implements Serializable {
     private String massSpectrogram;
     private String massSpectrogramNist;
 
+    private String article;
+
     @TableField(exist = false)
     private List<OdourDescription> odList;
 
@@ -73,7 +75,7 @@ public class Compound implements Serializable {
     private LocalDateTime updateTime = LocalDateTime.now();
 
     @TableLogic
-    private Integer isDeleted=0;
+    private Integer isDeleted=2;    //0-已检阅，通过 1-已删除 2-待检阅 3-已检阅，不通过
     /**
      * 上传人
      */

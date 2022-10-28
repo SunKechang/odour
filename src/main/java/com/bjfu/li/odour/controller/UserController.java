@@ -5,6 +5,8 @@ import com.bjfu.li.odour.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -34,11 +36,10 @@ public class UserController {
 //    }
     @PostMapping("/login")
     public String login(@RequestParam String userEmail,
-                        @RequestParam String userPassword) {
-        System.out.println("qqqq" + userPassword + " 1  " + userService.passwordMD5(userEmail, userPassword));
+                        @RequestParam String userPassword, HttpServletResponse response) {
         User user = new User();
         user.setUserEmail(userEmail);
         user.setUserPassword(userPassword);
-        return userService.selectUserEmail(user);
+        return userService.selectUserEmail(user, response);
     }
 }
