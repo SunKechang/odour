@@ -4,16 +4,16 @@ import com.bjfu.li.odour.article.form.UpdateForm;
 import com.bjfu.li.odour.article.mapper.ArticleMapper;
 import com.bjfu.li.odour.article.po.Article;
 import com.bjfu.li.odour.article.service.ArticleService;
+import com.bjfu.li.odour.utils.FileUtils;
 import com.bjfu.li.odour.utils.UUIDUtils;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 @Service
@@ -25,7 +25,7 @@ public class ArticleServiceImpl implements ArticleService {
     private String articleDir;
 
     @Override
-    public void add(Article article) throws IOException {
+    public int add(Article article) throws IOException {
         String uuid = UUIDUtils.getUUID();
         String originFile = article.getFile().getOriginalFilename();
         assert originFile != null;
@@ -36,7 +36,8 @@ public class ArticleServiceImpl implements ArticleService {
         out.write(data);
         out.close();
         article.setFilepath(file.getAbsolutePath());
-        articleMapper.add(article);
+        articleMapper.insert(article);
+        return article.getPk();
     }
 
     @Override
@@ -62,5 +63,34 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Article> searchByName(String name) {
         return articleMapper.searchByName(name);
+    }
+
+    @Override
+    public void getFile(HttpServletResponse response, int pk) {
+        Article article = articleMapper.getByPk(pk);
+        String filePath = article.getFilepath();
+        try {
+            FileInputStream inputStream = new FileInputStream(filePath);
+            byte[] data = new byte[inputStream.available()];
+            inputStream.read(data);
+            String diskfilename = FileUtils.getNameFromPath(filePath);
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + diskfilename + "\"");
+            System.out.println("data.length " + data.length);
+            response.setContentLength(data.length);
+            response.setHeader("Content-Range", "" + (data.length - 1));
+            response.setHeader("Accept-Ranges", "bytes");
+            OutputStream os = response.getOutputStream();
+
+            os.write(data);
+            //先声明的流后关掉！
+            os.flush();
+            os.close();
+            inputStream.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
     }
 }

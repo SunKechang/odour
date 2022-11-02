@@ -40,10 +40,12 @@ public class UserService {
         }else {
             Map<String, String> map = new HashMap<>();
             map.put("role", "" + dbUser.getRole());
+            map.put("id", "-1");
+            map.put("account", dbUser.getName());
             map.put("email", dbUser.getUserEmail());
             String jwt = JWTUtils.getToken(map);
             response.setHeader("Authorization", jwt);
-            result = "2";
+            result = jwt;
         }
         return result;
     }
@@ -56,7 +58,7 @@ public class UserService {
         String userPassword = user.getUserPassword();
         System.out.println(userEmail + "***" + userPassword);
         String passwordMD5 = passwordMD5(userEmail, userPassword);
-        userMapper.addUser(userEmail, passwordMD5);
+        userMapper.addUser(userEmail, passwordMD5, user.getName());
         return "1";
     }
 

@@ -11,7 +11,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public SverResponse<RuntimeException> doHandleRuntimeException(RuntimeException e) {
-        log.error("error message{}", e.getMessage());
+        e.printStackTrace();
         return SverResponse.createByErrorMessage(e.getMessage());
     }
 }

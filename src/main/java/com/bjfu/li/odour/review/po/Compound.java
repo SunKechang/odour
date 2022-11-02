@@ -1,23 +1,18 @@
-package com.bjfu.li.odour.po;
+package com.bjfu.li.odour.review.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.bjfu.li.odour.po.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 化合物
- */
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class Compound implements Serializable {
+public class Compound {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -45,8 +40,12 @@ public class Compound implements Serializable {
      * 质谱
      */
     private String massSpectrogram;
+
     private String massSpectrogramNist;
 
+    /**
+     * 索引文献的主键
+     */
     private String article;
 
     @TableField(exist = false)
@@ -61,7 +60,6 @@ public class Compound implements Serializable {
     @TableField(exist = false)
     private List<Nri> nriList;
 
-
     @TableField(exist = false)
     private List<Measured> mrList;
 
@@ -75,8 +73,7 @@ public class Compound implements Serializable {
     private LocalDateTime updateTime = LocalDateTime.now();
 
     @TableLogic
-    @TableField("is_deleted")
-    private Integer isDeleted;    //0-已检阅，通过 1-已删除 2-待检阅 3-已检阅，不通过
+    private Integer isDeleted=2;    //0-已检阅，通过 1-已删除 2-待检阅 3-已检阅，不通过
     /**
      * 上传人
      */

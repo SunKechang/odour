@@ -9,6 +9,7 @@ import java.io.OutputStream;
 public class Base64Utils {
     public static String generateImage(String imgStr, String imgDirPath) {
         File imgDir=new File(imgDirPath);
+        System.out.println(imgDir.getAbsolutePath());
         if(!imgDir.exists())
             imgDir.mkdir();
         //获取图片类型

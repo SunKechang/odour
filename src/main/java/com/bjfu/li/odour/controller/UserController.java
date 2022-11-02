@@ -1,5 +1,6 @@
 package com.bjfu.li.odour.controller;
 
+import com.bjfu.li.odour.common.pojo.SverResponse;
 import com.bjfu.li.odour.po.User;
 import com.bjfu.li.odour.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,11 @@ public class UserController {
 //    }
     @PostMapping("/register")
     public String register(@RequestParam String userEmail,
-                           @RequestParam String userPassword) {
-        System.out.println("开始注册" + userPassword );
+                           @RequestParam String userPassword, @RequestParam String name) {
         User user = new User();
         user.setUserEmail(userEmail);
         user.setUserPassword(userPassword);
+        user.setName(name);
         return userService.addUser(user);
     }
 
@@ -35,11 +36,11 @@ public class UserController {
 //        return userService.selectUserEmail(user);
 //    }
     @PostMapping("/login")
-    public String login(@RequestParam String userEmail,
-                        @RequestParam String userPassword, HttpServletResponse response) {
+    public SverResponse<String> login(@RequestParam String userEmail,
+                                       @RequestParam String userPassword, HttpServletResponse response) {
         User user = new User();
         user.setUserEmail(userEmail);
         user.setUserPassword(userPassword);
-        return userService.selectUserEmail(user, response);
+        return SverResponse.createRespBySuccess(userService.selectUserEmail(user, response));
     }
 }

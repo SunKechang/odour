@@ -9,6 +9,7 @@ import com.bjfu.li.odour.review.form.StatusForm;
 import com.bjfu.li.odour.review.service.ReviewService;
 import com.bjfu.li.odour.review.vo.CommitVo;
 import com.bjfu.li.odour.review.vo.ReviewVo;
+import com.bjfu.li.odour.review.vo.ReviewerVo;
 import com.bjfu.li.odour.review.vo.Unreview;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -103,5 +104,10 @@ public class ReviewController {
     @GetMapping("/get_approval")
     public SverResponse<List<ReviewVo>> getApproval(@RequestParam int comId) {
         return SverResponse.createRespBySuccess(reviewService.getApprovalList(comId));
+    }
+
+    @GetMapping("/get_reviewers")
+    public SverResponse<List<ReviewerVo>> getReviewers(@RequestParam String name) {
+        return SverResponse.createRespBySuccess(reviewService.getReviewers(name));
     }
 }

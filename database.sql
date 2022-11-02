@@ -2885,3 +2885,15 @@ CREATE TABLE `review` (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '审批表';
 
 ALTER TABLE `review` MODIFY COLUMN `reviewer_id` varchar(255) NOT NULL ;
+
+CREATE TABLE `log_upload_review`(
+    `pk` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+    `operation` varchar(255) DEFAULT NULL,
+    `ip` varchar(255) NOT NULL,
+    `email` varchar(255) NOT NULL,
+    `create_time` datetime(0) DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`pk`),
+    KEY(`email`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '上传&审批人员日志表';
+
+ALTER TABLE `user` ADD COLUMN `name` varchar(255) DEFAULT '';

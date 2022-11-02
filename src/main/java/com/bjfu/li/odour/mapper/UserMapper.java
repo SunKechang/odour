@@ -18,8 +18,8 @@ public interface UserMapper {
     @Select("select * from user where userEmail = #{userEmail}")
     public User getByEmail(String userEmail);
 
-    @Insert("insert into user(userEmail, userPassword) values(#{userEmail}, #{userPassword})")
-    public void addUser(String userEmail, String userPassword);
+    @Insert("insert into user(userEmail, userPassword, name) values(#{userEmail}, #{userPassword}, #{name})")
+    public void addUser(String userEmail, String userPassword, String name);
 
 }
 

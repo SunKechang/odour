@@ -41,5 +41,10 @@ public class FileUtils {
         }
     }
 
+    public static String getNameFromPath(String filePath) {
+        String separator = File.separator;
+        return filePath.substring(filePath.lastIndexOf(separator)+1);
+    }
+
 }
 

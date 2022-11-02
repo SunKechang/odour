@@ -27,4 +27,6 @@ public class CommitVo {
     private String massSpectrogramNist;
 
     private String article;
+
+    private int status; //0-已检阅，通过 3-已检阅，不通过
 }

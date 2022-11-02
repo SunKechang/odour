@@ -4,10 +4,12 @@ import com.bjfu.li.odour.review.form.ApproveForm;
 import com.bjfu.li.odour.review.form.StatusForm;
 import com.bjfu.li.odour.review.mapper.CompMapper;
 import com.bjfu.li.odour.review.mapper.ReviewMapper;
+import com.bjfu.li.odour.review.mapper.ReviewerMapper;
 import com.bjfu.li.odour.review.po.Review;
 import com.bjfu.li.odour.review.service.ReviewService;
 import com.bjfu.li.odour.review.vo.CommitVo;
 import com.bjfu.li.odour.review.vo.ReviewVo;
+import com.bjfu.li.odour.review.vo.ReviewerVo;
 import com.bjfu.li.odour.review.vo.Unreview;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Resource
     ReviewMapper reviewMapper;
+
+    @Resource
+    ReviewerMapper reviewerMapper;
 
     @Override
     public List<Unreview> getUnreviewed(String email) {
@@ -63,5 +68,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<ReviewVo> getApprovalList(int comId) {
         return reviewMapper.getReviewList(comId);
+    }
+
+    @Override
+    public List<ReviewerVo> getReviewers(String name) {
+        return reviewerMapper.getReviewers(name);
     }
 }

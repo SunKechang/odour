@@ -4,6 +4,7 @@ import com.bjfu.li.odour.review.form.ApproveForm;
 import com.bjfu.li.odour.review.form.StatusForm;
 import com.bjfu.li.odour.review.vo.CommitVo;
 import com.bjfu.li.odour.review.vo.ReviewVo;
+import com.bjfu.li.odour.review.vo.ReviewerVo;
 import com.bjfu.li.odour.review.vo.Unreview;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface ReviewService {
     void approve(ApproveForm form, String email);
 
     List<ReviewVo> getApprovalList(int comId);
+
+    List<ReviewerVo> getReviewers(String name);
 }

@@ -10,6 +10,6 @@ public class ApproveForm {
 
     private String comment;
 
-    @Range(min = 3, max = 4)
+    @Range(min = 0, max = 4)
     private int status;
 }

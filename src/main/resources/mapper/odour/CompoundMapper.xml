@@ -14,6 +14,7 @@
         <result column="update_time" property="updateTime"/>
         <result column="uploader" property="uploader"/>
         <result column="reviewer" property="reviewer"/>
+        <result column="article" property="article"/>
 
 
         <collection property="riList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.Ri">
@@ -279,4 +280,11 @@
           and c.id=low_measured.compound_id
           and cas_no=#{casNo}
     </select>
+    <update id="updateOne" parameterType="com.bjfu.li.odour.po.Compound">
+        UPDATE `compound`
+        SET compound_name = #{comp.compoundName}, synonym = #{comp.synonym}, cas_no = #{comp.casNo},
+            article = #{comp.article}, update_time = #{comp.updateTime}, reviewer = #{comp.reviewer},
+            is_deleted = #{comp.isDeleted}
+        WHERE id=#{comp.id}
+    </update>
 </mapper>

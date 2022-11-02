@@ -12,6 +12,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -28,13 +30,14 @@ public class ArticleController {
     ArticleService articleService;
 
     @PostMapping("/add")
-    public SverResponse<String> add(Article article){
+    public SverResponse<Integer> add(Article article){
+        int pk = -1;
         try {
-            articleService.add(article);
+            pk = articleService.add(article);
         } catch (IOException exception) {
             return SverResponse.createByErrorCodeMessage(502, "file save error");
         }
-        return SverResponse.createRespBySuccess();
+        return SverResponse.createRespBySuccess(pk);
     }
 
     @PostMapping("/update")
@@ -61,5 +64,11 @@ public class ArticleController {
 
         return SverResponse.createRespBySuccess(pageInfo);
     }
+
+    @GetMapping("/getFile")
+    public void getFile(HttpServletResponse response, @RequestParam int pk) {
+        articleService.getFile(response, pk);
+    }
+
 
 }

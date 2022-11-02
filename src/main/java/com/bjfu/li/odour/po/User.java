@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 public class User {
     private String userEmail;
     private String userPassword;
+    private String name;
 
-    private int role;
+    private int role;   //1-上传员 2-审核员
 }

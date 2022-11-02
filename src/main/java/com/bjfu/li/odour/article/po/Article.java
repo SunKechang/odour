@@ -1,6 +1,7 @@
 package com.bjfu.li.odour.article.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,8 @@ public class Article {
     @NotNull
     private String name;
     private String filepath;
+
     @NotNull
+    @TableField(exist = false)
     private MultipartFile file;
 }

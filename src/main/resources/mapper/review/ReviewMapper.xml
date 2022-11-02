@@ -3,12 +3,14 @@
 <mapper namespace="com.bjfu.li.odour.review.mapper.ReviewMapper">
     <resultMap id="reviewVoMap" type="com.bjfu.li.odour.review.vo.ReviewVo">
         <result column="comment" property="comment" />
-        <result column="reviewer_id" property="reviewMail" />
+        <result column="user_name" property="name" />
         <result column="create_time" property="createTime" />
     </resultMap>
     <select id="getReviewList" resultMap="reviewVoMap">
-        SELECT r.*
+        SELECT r.*, u.name as user_name
         FROM review r
+        LEFT JOIN user u
+        ON r.reviewer_id = u.userEmail
         WHERE r.com_id = #{comId}
     </select>
 </mapper>

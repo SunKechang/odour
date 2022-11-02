@@ -129,6 +129,7 @@ public class CompoundController {
      */
     @PostMapping("/update")
     public SverResponse<String> updateCompound(@RequestBody Compound compound,HttpServletRequest request){
+        compound.setIsDeleted(0);
         if(compoundService.update(compound)){
             String token= request.getHeader("Authorization");
             DecodedJWT verify=JWTUtils.verify(token);

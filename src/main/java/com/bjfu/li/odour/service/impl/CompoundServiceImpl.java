@@ -237,7 +237,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 compound.setMassSpectrogramNist(massSpectrogramNist);
             }
             compound.setUpdateTime(LocalDateTime.now());
-            compoundMapper.updateById(compound);
+            compoundMapper.updateOne(compound);
 
             // 更新ri
             QueryWrapper<Ri> riQueryWrapper=new QueryWrapper<>();

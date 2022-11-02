@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class ReviewVo {
     private String comment;
 
-    private String reviewMail;
+    private String name;
 
     @JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

@@ -30,7 +30,7 @@ pagehelper:
   supportMethodsArguments: true
   params: count=countSql
 
-localImgPath: E:\GitHub\Beijing Forestry University\odour\src\main\resources\static\
+localImgPath: D:\IdeaProjects\TxWork\localImg\
 
 networkImgPath: /static/
 
