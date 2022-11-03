@@ -4,6 +4,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.bjfu.li.odour.article.po.Article;
 import com.bjfu.li.odour.common.pojo.SverResponse;
 import com.bjfu.li.odour.common.token.JWTUtils;
+import com.bjfu.li.odour.log.po.LogUploadReview;
+import com.bjfu.li.odour.log.service.UploadReviewService;
 import com.bjfu.li.odour.review.form.ApproveForm;
 import com.bjfu.li.odour.review.form.StatusForm;
 import com.bjfu.li.odour.review.service.ReviewService;
@@ -26,6 +28,9 @@ public class ReviewController {
 
     @Resource
     ReviewService reviewService;
+
+    @Resource
+    UploadReviewService uploadReviewService;
 
     @GetMapping("/get_unreviewed")
     public SverResponse<PageInfo> getUnreviewed(HttpServletRequest request, @RequestParam int pageNum,
@@ -94,9 +99,15 @@ public class ReviewController {
 
     @PostMapping("/approve")
     public SverResponse<String> approve(@RequestBody ApproveForm form, HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        DecodedJWT verify= JWTUtils.verify(token);
+        String token= request.getHeader("Authorization");
+        DecodedJWT verify=JWTUtils.verify(token);
         String email = verify.getClaim("email").asString();
+        LogUploadReview log = new LogUploadReview();
+        log.setOperation("REVIEW "+form.getComId());
+        log.setEmail(email);
+        log.setIp(request.getRemoteAddr());
+        uploadReviewService.insertLog(log);
+
         reviewService.approve(form, email);
         return SverResponse.createRespBySuccess("Success");
     }

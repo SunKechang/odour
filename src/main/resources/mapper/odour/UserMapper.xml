@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjfu.li.odour.mapper.UserMapper">
+    <resultMap type="com.bjfu.li.odour.po.User" id="userMap">
+        <id property="id" column="id"/>
+        <result column="compound_name" property="compoundName" />
+        <result column="userEmail" property="userEmail" />
+        <result column="userPassword" property="userPassword" />
+        <result column="name" property="name" />
+        <result column="role" property="role" />
+    </resultMap>
+    <select id="getUsers" resultMap="userMap" parameterType="com.bjfu.li.odour.form.UserSearchForm">
+        SELECT *
+        FROM user u
+        WHERE
+        u.role = #{form.role}
+        <if test="form.email != ''">
+            AND
+            <bind name="searchEmail" value=" '%' + form.email + '%' "/>
+            u.userEmail like #{searchEmail}
+        </if>
+        <if test="form.name != ''">
+            AND
+            <bind name="searchName" value=" '%' + form.name + '%' "/>
+            u.name like #{searchName}
+        </if>
+    </select>
+    <update id="setRole" parameterType="com.bjfu.li.odour.form.UserRoleForm">
+        UPDATE `user`
+        SET role = #{form.role}
+        WHERE userEmail = #{form.email}
+    </update>
+</mapper>

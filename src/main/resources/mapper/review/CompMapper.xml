@@ -10,6 +10,7 @@
         <result column="mass_spectrogram" property="massSpectrogram" />
         <result column="mass_spectrogram_nist" property="massSpectrogramNist" />
         <result column="article" property="article" />
+        <result column="is_deleted" property="status" />
     </resultMap>
     <resultMap type="com.bjfu.li.odour.review.vo.CommitVo" id="commitMap">
         <id property="id" column="id"/>
@@ -32,7 +33,7 @@
 
     <select id="getReviewed" resultMap="unreviewedMap">
         SELECT c.id, c.compound_name,c.synonym, c.cas_no, c.chemical_structure, c.mass_spectrogram, c.mass_spectrogram_nist,
-               c.article
+               c.article, c.is_deleted
         FROM compound c
         WHERE (c.is_deleted = 0 OR c.is_deleted = 3)
           AND c.reviewer = #{email}

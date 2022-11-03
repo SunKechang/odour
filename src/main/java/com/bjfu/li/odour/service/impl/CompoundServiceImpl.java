@@ -2,8 +2,11 @@ package com.bjfu.li.odour.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.bjfu.li.odour.article.mapper.ArticleMapper;
+import com.bjfu.li.odour.article.po.Article;
 import com.bjfu.li.odour.mapper.*;
 import com.bjfu.li.odour.po.*;
+import com.bjfu.li.odour.review.mapper.ReviewerMapper;
 import com.bjfu.li.odour.service.ICompoundService;
 import com.bjfu.li.odour.utils.Base64Utils;
 import com.bjfu.li.odour.utils.PageResult;
@@ -61,6 +64,11 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     ProductOdourThresholdMapper productOtMapper;
     @Resource
     ProductOdourDescriptionMapper productOdMapper;
+    @Resource
+    ArticleMapper articleMapper;
+    @Resource
+    ReviewerMapper reviewerMapper;
+
     @Value("${localImgPath}")
     String localImgPath;
     @Value("${networkImgPath}")
@@ -440,6 +448,10 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             productList.add(product);
         }
         compound.setProductList(productList);
+        Article article = articleMapper.getByPk(Integer.valueOf(compound.getArticle()));
+        compound.setArticleName(article.getName());
+        String reviewerName = reviewerMapper.getNameByEmail(compound.getReviewer());
+        compound.setReviewerName(reviewerName);
         return compound;
     }
 

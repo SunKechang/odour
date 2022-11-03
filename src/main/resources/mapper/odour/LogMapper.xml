@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bjfu.li.odour.mapper.LogMapper">
-
+    <resultMap id="userLogMap" type="com.bjfu.li.odour.vo.UserLogVo">
+        <result column="operation" property="operation" />
+        <result column="email" property="email" />
+        <result column="name" property="name" />
+        <result column="ip" property="ip" />
+        <result column="create_time" property="time" />
+    </resultMap>
+    <select id="getUserLogList" parameterType="com.bjfu.li.odour.form.UserLogForm" resultMap="userLogMap">
+        SELECT l.operation, l.email, user.name, l.ip, l.create_time
+        FROM log_upload_review l
+        LEFT JOIN user ON
+        l.email = user.userEmail
+        WHERE 1 =1
+        <if test="form.operation != ''">
+            AND
+            <bind name="searchOpe" value=" '%' + form.operation + '%' "/>
+            l.operation like #{searchOpe}
+        </if>
+        <if test="form.email != ''">
+            AND
+            <bind name="searchEmail" value=" '%' + form.email + '%' "/>
+            l.email like #{searchEmail}
+        </if>
+    </select>
 </mapper>

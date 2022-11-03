@@ -30,11 +30,21 @@ public class UserCompoundController {
     @Resource
     UploadReviewService reviewService;
 
+    @Resource
+    UploadReviewService uploadReviewService;
+
     @PostMapping("/update")
-    @LogAop(operation = "用户更新化合物信息")
     public SverResponse<String> updateCompound(@RequestBody Compound compound, HttpServletRequest request){
         compound.setIsDeleted(2);
         compoundService.update(compound);
+        String token= request.getHeader("Authorization");
+        DecodedJWT verify=JWTUtils.verify(token);
+        String email = verify.getClaim("email").asString();
+        LogUploadReview log = new LogUploadReview();
+        log.setOperation("UPDATE "+compound.getId());
+        log.setEmail(email);
+        log.setIp(request.getRemoteAddr());
+        uploadReviewService.insertLog(log);
         return SverResponse.createRespBySuccess();
     }
 

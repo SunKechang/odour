@@ -50,6 +50,9 @@ public class Compound implements Serializable {
     private String article;
 
     @TableField(exist = false)
+    private String articleName;
+
+    @TableField(exist = false)
     private List<OdourDescription> odList;
 
     @TableField(exist = false)
@@ -87,6 +90,9 @@ public class Compound implements Serializable {
      */
     @TableField("reviewer")
     private String reviewer;
+
+    @TableField(exist = false)
+    private String reviewerName;
     /**
      * 包含此化合物的产品
      */

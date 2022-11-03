@@ -1,10 +1,12 @@
 package com.bjfu.li.odour.service.impl;
 
+import com.bjfu.li.odour.form.UserLogForm;
 import com.bjfu.li.odour.po.Log;
 import com.bjfu.li.odour.mapper.LogMapper;
 import com.bjfu.li.odour.service.ILogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bjfu.li.odour.vo.LogVo;
+import com.bjfu.li.odour.vo.UserLogVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,6 +29,11 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements ILogS
     @Override
     public List<LogVo> getLogList() {
         return logMapper.selectLogList();
+    }
+
+    @Override
+    public List<UserLogVo> getUserLogList(UserLogForm form) {
+        return logMapper.getUserLogList(form);
     }
 
 

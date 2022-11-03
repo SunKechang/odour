@@ -1,8 +1,10 @@
 package com.bjfu.li.odour.service;
 
+import com.bjfu.li.odour.form.UserLogForm;
 import com.bjfu.li.odour.po.Log;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.bjfu.li.odour.vo.LogVo;
+import com.bjfu.li.odour.vo.UserLogVo;
 
 import java.util.List;
 
@@ -16,4 +18,6 @@ import java.util.List;
  */
 public interface ILogService extends IService<Log> {
     List<LogVo> getLogList();
+
+    List<UserLogVo> getUserLogList(UserLogForm form);
 }

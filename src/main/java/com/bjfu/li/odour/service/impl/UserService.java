@@ -1,9 +1,10 @@
 package com.bjfu.li.odour.service.impl;
 
 import com.bjfu.li.odour.common.token.JWTUtils;
+import com.bjfu.li.odour.form.UserRoleForm;
+import com.bjfu.li.odour.form.UserSearchForm;
 import com.bjfu.li.odour.mapper.UserMapper;
 import com.bjfu.li.odour.po.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -95,5 +97,13 @@ public class UserService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<User> getUsers(UserSearchForm form) {
+        return userMapper.getUsers(form);
+    }
+
+    public void setRole(UserRoleForm form) {
+        userMapper.setRole(form);
     }
 }

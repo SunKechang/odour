@@ -1,8 +1,11 @@
 package com.bjfu.li.odour.mapper;
 
+import com.bjfu.li.odour.form.UserLogForm;
 import com.bjfu.li.odour.po.Log;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.bjfu.li.odour.vo.LogVo;
+import com.bjfu.li.odour.vo.UserLogVo;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -22,5 +25,7 @@ public interface LogMapper extends BaseMapper<Log> {
             "and l.compound_id=c.id " +
             "order by operate_time desc")
     List<LogVo> selectLogList();
+
+    List<UserLogVo> getUserLogList(@Param("form")UserLogForm form);
 
 }
