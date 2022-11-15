@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.bjfu.li.odour.article.form.UpdateForm;
 import com.bjfu.li.odour.article.po.Article;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -15,4 +16,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
     void updateByPk(@Param("form") UpdateForm form);
 
     List<Article> searchByName(@Param("name") String name);
+
+    @Select("SELECT * FROM `article` WHERE name = #{name}")
+    List<Article> getByName(String name);
 }

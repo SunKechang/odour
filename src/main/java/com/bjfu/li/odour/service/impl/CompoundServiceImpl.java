@@ -405,13 +405,9 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     public Compound getOne(Integer id) {
         Compound compound = compoundMapper.selectOne(id);
         // odList
-        QueryWrapper<OdourDescription> odQueryWrapper=new QueryWrapper<>();
-        odQueryWrapper.eq("compound_id", id);
-        compound.setOdList(odMapper.selectList(odQueryWrapper));
+        compound.setOdList(odMapper.selectByCompoundId(id));
         // otList
-        QueryWrapper<OdourThreshold> otQueryWrapper=new QueryWrapper<>();
-        otQueryWrapper.eq("compound_id", id);
-        compound.setOtList(otMapper.selectList(otQueryWrapper));
+        compound.setOtList(otMapper.selectByCompoundId(id));
         // riList
         QueryWrapper<Ri> riQueryWrapper=new QueryWrapper<>();
         riQueryWrapper.eq("compound_id", id);
@@ -437,19 +433,11 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             Product product;
             Integer productId = productKey.getProductId();
             product = productMapper.selectById(productId);
-            QueryWrapper<ProductOdourDescription> productOdQueryWrapper = new QueryWrapper<>();
-            productOdQueryWrapper.eq("compound_id", id);
-            productOdQueryWrapper.eq("product_id", productId);
-            product.setOdList(productOdMapper.selectList(productOdQueryWrapper));
-            QueryWrapper<ProductOdourThreshold> productOtQueryWrapper = new QueryWrapper<>();
-            productOtQueryWrapper.eq("compound_id", id);
-            productOtQueryWrapper.eq("product_id", productId);
-            product.setOtList(productOtMapper.selectList(productOtQueryWrapper));
+            product.setOdList(productOdMapper.selectByCompoundId(id, productId));
+            product.setOtList(productOtMapper.selectByCompoundId(id, productId));
             productList.add(product);
         }
         compound.setProductList(productList);
-        Article article = articleMapper.getByPk(Integer.valueOf(compound.getArticle()));
-        compound.setArticleName(article.getName());
         String reviewerName = reviewerMapper.getNameByEmail(compound.getReviewer());
         compound.setReviewerName(reviewerName);
         return compound;

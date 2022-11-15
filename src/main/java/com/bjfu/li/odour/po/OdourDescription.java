@@ -1,6 +1,7 @@
 package com.bjfu.li.odour.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,9 +26,10 @@ public class OdourDescription implements Serializable {
 
     private String odourDescription;
 
-    private String odourDescriptionReference;
+    private String articleId;
 
     private Integer compoundId;
 
-
+    @TableField(exist = false)
+    private String articleName;
 }

@@ -70,5 +70,8 @@ public class ArticleController {
         articleService.getFile(response, pk);
     }
 
-
+    @GetMapping("/judgeName")
+    public SverResponse<Boolean> judgeFileName(@RequestParam String name) {
+        return SverResponse.createRespBySuccess(articleService.judgeFileName(name));
+    }
 }

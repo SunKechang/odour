@@ -207,7 +207,7 @@ public class ProExcel {
                     if(colnum%2==0)
                         S2cell0.setCellValue(compounds.get(rownum).getOdList().get(colnum/2).getOdourDescription());
                     if(colnum%2==1)
-                        S2cell0.setCellValue(compounds.get(rownum).getOdList().get(colnum/2).getOdourDescriptionReference());
+                        S2cell0.setCellValue(compounds.get(rownum).getOdList().get(colnum/2).getArticleId());
                 }
 
             }
@@ -243,7 +243,7 @@ public class ProExcel {
                         else
                             S2cell0.setCellValue(compounds.get(rownum).getOtList().get(colnum/3).getOdourThreshold().toString());
                     if(colnum%3==1)
-                            S2cell0.setCellValue(compounds.get(rownum).getOtList().get(colnum/3).getOdourThresholdReference());
+                            S2cell0.setCellValue(compounds.get(rownum).getOtList().get(colnum/3).getArticleId());
                     if(colnum%3==2)
                         S2cell0.setCellValue(compounds.get(rownum).getOtList().get(colnum/3).getOdourBase());
                 }

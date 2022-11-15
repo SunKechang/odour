@@ -197,7 +197,7 @@ public class Excel {
                         cell2.setCellValue(compound.getOdList().get(odnum).getOdourDescription());
                         HSSFCell cell3 = odRow.createCell(13);
                         cell3.setCellStyle(style);
-                        cell3.setCellValue(compound.getOdList().get(odnum).getOdourDescriptionReference());
+                        cell3.setCellValue(compound.getOdList().get(odnum).getArticleId());
 
                     }
                 }
@@ -219,7 +219,7 @@ public class Excel {
 
                         HSSFCell cell4 = otRow.createCell(16);
                         cell4.setCellStyle(style);
-                        cell4.setCellValue(compound.getOtList().get(otnum).getOdourThresholdReference());
+                        cell4.setCellValue(compound.getOtList().get(otnum).getArticleId());
 
                     }
                 }

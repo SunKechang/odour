@@ -26,7 +26,5 @@ public class Unreview {
     private String massSpectrogram;
     private String massSpectrogramNist;
 
-    private String article;
-
     private int status;
 }

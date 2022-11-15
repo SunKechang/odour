@@ -47,11 +47,6 @@ public class Compound implements Serializable {
     private String massSpectrogram;
     private String massSpectrogramNist;
 
-    private String article;
-
-    @TableField(exist = false)
-    private String articleName;
-
     @TableField(exist = false)
     private List<OdourDescription> odList;
 

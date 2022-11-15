@@ -1,6 +1,7 @@
 package com.bjfu.li.odour.po;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,11 +39,14 @@ public class ProductOdourThreshold implements Serializable {
      */
     private BigDecimal odourThreshold;
     /**
-     * 阈值来源
+     * 阈值来源(文章id)
      */
-    private String odourThresholdReference;
+    private String articleId;
     /**
      * Base
      */
     private String odourThresholdBase;
+
+    @TableField(exist = false)
+    private String articleName;
 }

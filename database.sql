@@ -2897,3 +2897,17 @@ CREATE TABLE `log_upload_review`(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '上传&审批人员日志表';
 
 ALTER TABLE `user` ADD COLUMN `name` varchar(255) DEFAULT '';
+ALTER TABLE `odour_threshold` ADD COLUMN `article` bigint(20) DEFAULT 0;
+ALTER TABLE `odour_threshold` DROP `odour_threshold_reference`;
+ALTER TABLE `odour_threshold` DROP `article`;
+ALTER TABLE `odour_threshold` ADD COLUMN `article_id` bigint(20) DEFAULT 0;
+ALTER TABLE `compound` DROP `article`;
+
+ALTER TABLE `product_odour_threshold` ADD COLUMN `article_id` bigint(20) DEFAULT 0;
+ALTER TABLE `product_odour_threshold` DROP `odour_threshold_reference`;
+
+ALTER TABLE `odour_description` ADD COLUMN `article_id` bigint(20) DEFAULT 0;
+ALTER TABLE `odour_description` DROP `odour_description_reference`;
+
+ALTER TABLE `product_odour_description` ADD COLUMN `article_id` bigint(20) DEFAULT 0;
+ALTER TABLE `product_odour_description` DROP `odour_description_reference`;

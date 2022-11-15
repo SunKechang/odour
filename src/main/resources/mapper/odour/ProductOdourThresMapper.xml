@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjfu.li.odour.mapper.ProductOdourThresholdMapper">
+    <resultMap type="com.bjfu.li.odour.po.ProductOdourThreshold" id="procOtMap">
+        <id property="id" column="id"/>
+        <result property="productId" column="product_id"/>
+        <result property="compoundId" column="compound_id"/>
+        <result property="odourThreshold" column="odour_threshold"/>
+        <result property="odourThresholdBase" column="odour_threshold_base"/>
+        <result property="articleId" column="article_id"/>
+        <result property="articleName" column="article_name"/>
+    </resultMap>
+    <select id="selectByCompoundId" resultMap="procOtMap">
+        SELECT pot.*, article.name as article_name
+        FROM product_odour_threshold pot
+                 LEFT JOIN article
+                           ON pot.article_id = article.pk
+        WHERE pot.compound_id = #{compoundId} and pot.product_id = #{productId}
+    </select>
+</mapper>
+
+

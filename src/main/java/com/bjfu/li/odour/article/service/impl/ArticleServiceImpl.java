@@ -70,11 +70,12 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getByPk(pk);
         String filePath = article.getFilepath();
         try {
+            System.out.println(filePath);
             FileInputStream inputStream = new FileInputStream(filePath);
             byte[] data = new byte[inputStream.available()];
             inputStream.read(data);
             String diskfilename = FileUtils.getNameFromPath(filePath);
-            response.setContentType("application/octet-stream");
+            response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + diskfilename + "\"");
             System.out.println("data.length " + data.length);
             response.setContentLength(data.length);
@@ -91,6 +92,16 @@ public class ArticleServiceImpl implements ArticleService {
         } catch (Exception e) {
             e.printStackTrace();
 
+        }
+    }
+
+    @Override
+    public boolean judgeFileName(String name) {
+        List<Article> articleList = articleMapper.getByName(name);
+        if(articleList.size() > 0) {
+            return false;
+        } else {
+            return true;
         }
     }
 }

@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bjfu.li.odour.mapper.OdourDescriptionMapper">
-
+    <resultMap type="com.bjfu.li.odour.po.OdourDescription" id="odMap">
+        <id property="id" column="id"/>
+        <result property="odourDescription" column="odour_description"/>
+        <result property="articleId" column="article_id"/>
+        <result property="compoundId" column="compound_id"/>
+        <result property="articleName" column="article_name"/>
+    </resultMap>
+    <select id="selectByCompoundId" resultMap="odMap">
+        SELECT od.*, article.name as article_name
+        FROM odour_description od
+                 LEFT JOIN article
+                           ON od.article_id = article.pk
+        WHERE od.compound_id = #{id}
+    </select>
 </mapper>
 
 

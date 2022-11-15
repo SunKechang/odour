@@ -15,4 +15,6 @@ public interface ArticleService {
     List<Article> searchByName(String name);
 
     void getFile(HttpServletResponse response, int pk);
+
+    boolean judgeFileName(String name);
 }
