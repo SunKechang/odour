@@ -16,6 +16,17 @@
         ON ot.article_id = article.pk
         WHERE ot.compound_id = #{id}
     </select>
+
+    <select id="getThresholdBase" resultType="java.lang.String">
+        SELECT DISTINCT ot.odour_base
+        FROM odour_threshold ot
+        WHERE ot.odour_base IS NOT NULL
+    </select>
+    <select id="getFunctionBase" resultType="java.lang.String">
+        SELECT DISTINCT oif.odour_base
+        FROM odour_intensity_function oif
+        WHERE oif.odour_base IS NOT NULL
+    </select>
 </mapper>
 
 

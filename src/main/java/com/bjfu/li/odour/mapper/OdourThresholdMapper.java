@@ -9,4 +9,8 @@ import java.util.List;
 public interface OdourThresholdMapper extends BaseMapper<OdourThreshold> {
 
     List<OdourThreshold> selectByCompoundId(Integer id);
+
+    List<String> getThresholdBase();
+
+    List<String> getFunctionBase();
 }

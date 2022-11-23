@@ -2911,3 +2911,25 @@ ALTER TABLE `odour_description` DROP `odour_description_reference`;
 
 ALTER TABLE `product_odour_description` ADD COLUMN `article_id` bigint(20) DEFAULT 0;
 ALTER TABLE `product_odour_description` DROP `odour_description_reference`;
+
+
+DROP TABLE IF EXISTS `odour_intensity_function`;
+CREATE TABLE `odour_intensity_function`  (
+                                 `id` int(11) NOT NULL AUTO_INCREMENT,
+                                 `odour_base` char(255) CHARACTER SET gbk COLLATE gbk_chinese_ci NULL DEFAULT NULL,
+                                 `function_img` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+                                 `article_id` bigint(20) DEFAULT -1,
+                                 `compound_id` int(11) NOT NULL,
+                                    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 332 CHARACTER SET = gbk COLLATE = gbk_chinese_ci ROW_FORMAT = DYNAMIC;
+
+DROP TABLE IF EXISTS `base`;
+CREATE TABLE `base`  (
+                                             `id` int(11) NOT NULL AUTO_INCREMENT,
+                                             `base` char(255) CHARACTER SET gbk COLLATE gbk_chinese_ci NULL DEFAULT NULL,
+                                             `img_path` text CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+                                             PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM CHARACTER SET = gbk COLLATE = gbk_chinese_ci ROW_FORMAT = DYNAMIC;
+
+ALTER TABLE `base` ADD COLUMN `kind` int(11) NOT NULL;
+ALTER TABLE `base` ADD COLUMN `importance` int(11) DEFAULT 0;

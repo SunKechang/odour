@@ -13,6 +13,8 @@ import com.bjfu.li.odour.utils.Excel;
 import com.bjfu.li.odour.utils.ExcelUtils;
 import com.bjfu.li.odour.utils.PageResult;
 import com.bjfu.li.odour.utils.ProExcel;
+import com.bjfu.li.odour.vo.BasesVo;
+import com.bjfu.li.odour.vo.DownloadVo;
 import com.bjfu.li.odour.vo.NewsVo;
 import com.bjfu.li.odour.vo.SearchVo;
 import org.springframework.core.io.ClassPathResource;
@@ -229,17 +231,20 @@ public class CompoundController {
     @PostMapping("/downloadpro")
     public void downloadProCompounds(@RequestBody  Map<String,List<String>> dataMap,HttpServletResponse response) {
         System.out.println(dataMap);
-        List<Compound> compounds=new ArrayList<>();
+        List<DownloadVo> compounds=new ArrayList<>();
         List<String> needSheet = dataMap.get("check");
 
         for(int i=0;i<dataMap.get("cas").size();i++) {
-            List<Compound> compound = compoundService.searchByCasPro(dataMap.get("cas").get(i));
+            List<DownloadVo> compound = compoundService.searchByCasPro(dataMap.get("cas").get(i));
             if(!compound.isEmpty()){
                 compounds.add(compound.get(0));
             }
         }
-        System.out.println(compounds.get(1));
-        System.out.println(compounds.get(1).getCasNo());
         ProExcel.createExcelFile(response,compounds,needSheet);
+    }
+
+    @GetMapping("/get_base")
+    public SverResponse<BasesVo> getBase() {
+        return SverResponse.createRespBySuccess(compoundService.getAllBase());
     }
 }

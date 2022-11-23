@@ -15,6 +15,9 @@
         <result column="uploader" property="uploader"/>
         <result column="reviewer" property="reviewer"/>
         <result column="article" property="article"/>
+        <result column="description" property="description"/>
+        <result column="odour_base" property="odourBase"/>
+        <result column="odour_threshold" property="odourThreshold"/>
 
 
         <collection property="riList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.Ri">
@@ -63,6 +66,25 @@
             <result column="low_compound_id" property="compoundId"/>
         </collection>
     </resultMap>
+    <resultMap id="DownloadMap" type="com.bjfu.li.odour.vo.DownloadVo">
+        <id column="id" property="id"/>
+        <result column="compound_name" property="compoundName"/>
+        <result column="synonym" property="synonym"/>
+        <result column="cas_no" property="casNo"/>
+
+        <collection property="otList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.OdourThreshold">
+            <id column="ot_id" property="id"/>
+            <result column="ot_odour_threshold" property="odourThreshold"/>
+            <result column="ot_odour_base" property="odourBase"/>
+            <result column="threshold_article_name" property="articleName"/>
+        </collection>
+
+        <collection property="odList" javaType="ArrayList" ofType="com.bjfu.li.odour.po.OdourDescription">
+            <id column="od_id" property="id"/>
+            <result column="od_odour_description" property="odourDescription"/>
+            <result column="description_article_name" property="articleName"/>
+        </collection>
+    </resultMap>
     <select id="selectOne" resultMap="CompoundRiMap">
         SELECT c.*
         FROM compound AS c
@@ -73,24 +95,44 @@
         FROM compound
         WHERE is_deleted = 0
     </select>
-    <select id="dynamicSelect" resultMap="CompoundRiMap">
-        SELECT * FROM compound compound
+    <select id="dynamicSelect" resultMap="CompoundRiMap" parameterType="com.bjfu.li.odour.vo.SearchVo">
+        SELECT *,
+        <choose>
+            <when test="searchVo.searchKind == 1">
+                (SELECT COUNT(*) FROM odour_threshold ot WHERE ot.odour_base = #{searchVo.base}
+                AND ot.compound_id = compound.id) as base_num
+            </when>
+            <otherwise>
+                'x'
+            </otherwise>
+        </choose>,
+        <choose>
+            <when test="searchVo.searchKind == 2">
+                (SELECT COUNT(*) FROM odour_intensity_function oif WHERE oif.odour_base = #{searchVo.base}
+                AND oif.compound_id = compound.id) as base_num
+            </when>
+            <otherwise>
+                'y'
+            </otherwise>
+        </choose>
+               FROM compound
         <where>
-            <foreach collection="list" index="index" item="searchVo" open=" " separator=" " close=" ">
-                <if test="searchVo.searchRule == 'equal'">
-                    AND ${searchVo.searchProperty} = #{searchVo.searchValue}
-                </if>
-                <if test="searchVo.searchRule == 'large'">
-                    AND ${searchVo.searchProperty} &gt; #{searchVo.searchValue}
-                </if>
-                <if test="searchVo.searchRule == 'small'">
-                    AND ${searchVo.searchProperty} &lt; #{searchVo.searchValue}
-                </if>
-                <if test="searchVo.searchRule == 'like'">
-                    AND ${searchVo.searchProperty} like concat("%", #{searchVo.searchValue}, "%")
-                </if>
-            </foreach>
+            <if test="searchVo.searchRule == 'equal'">
+                AND ${searchVo.searchProperty} = #{searchVo.searchValue}
+            </if>
+            <if test="searchVo.searchRule == 'large'">
+                AND ${searchVo.searchProperty} &gt; #{searchVo.searchValue}
+            </if>
+            <if test="searchVo.searchRule == 'small'">
+                AND ${searchVo.searchProperty} &lt; #{searchVo.searchValue}
+            </if>
+            <if test="searchVo.searchRule == 'like'">
+                AND ${searchVo.searchProperty} like concat("%", #{searchVo.searchValue}, "%")
+            </if>
         </where>
+        <if test="searchVo.searchKind != 0">
+            HAVING base_num > 0
+        </if>
     </select>
     <select id="selectByOdourDescription" resultMap="CompoundRiMap">
         SELECT compound.id,
@@ -98,7 +140,26 @@
                compound.synonym,
                compound.cas_no,
                compound.is_deleted,
-               compound.update_time
+               compound.update_time,
+               MAX(od.odour_description) as description,
+                <choose>
+                    <when test="kind == 1">
+                        (SELECT COUNT(*) FROM odour_threshold ot WHERE ot.odour_base = #{base}
+                        AND ot.compound_id = compound.id) as base_num
+                    </when>
+                    <otherwise>
+                        'x'
+                    </otherwise>
+                </choose>,
+                <choose>
+                    <when test="kind == 2">
+                        (SELECT COUNT(*) FROM odour_intensity_function oif WHERE oif.odour_base = #{base}
+                        AND oif.compound_id = compound.id) as base_num
+                    </when>
+                    <otherwise>
+                        'y'
+                    </otherwise>
+                </choose>
         FROM compound
                  LEFT JOIN odour_description od ON od.compound_id = compound.id
         WHERE od.odour_description like "%"#{description}"%" AND compound.is_deleted = 0
@@ -109,19 +170,30 @@
             compound.cas_no,
             compound.is_deleted,
             compound.update_time
+        <if test="kind != 0">
+            HAVING base_num > 0
+        </if>
     </select>
     <select id="selectByOdourThreshold" resultMap="CompoundRiMap">
-        SELECT compound.id,
+        SELECT MAX(ot.odour_threshold) as odour_threshold,
+               ot.compound_id,
+               MAX(ot.odour_base) as odour_base,
+               compound.id,
                compound.compound_name,
                compound.synonym,
                compound.cas_no,
                compound.is_deleted,
                compound.update_time
-        FROM compound compound
-                 LEFT JOIN odour_threshold ot ON ot.compound_id = compound.id
-        WHERE ot.odour_threshold between #{low} and #{high}
+        FROM odour_threshold ot
+                 INNER JOIN
+             (SELECT MAX(ot2.odour_threshold) as maxthreshold, ot2.compound_id as comp_id FROM odour_threshold ot2
+              WHERE ot2.odour_threshold between #{low} and #{high}
+              GROUP BY ot2.compound_id) as max_table
+             ON ot.compound_id = max_table.comp_id
+        LEFT JOIN compound ON ot.compound_id = compound.id
+        WHERE ot.odour_threshold = max_table.maxthreshold
           AND compound.is_deleted = 0
-        GROUP BY compound.id,
+        GROUP BY ot.compound_id,
                  compound.compound_name,
                  compound.synonym,
                  compound.cas_no,
@@ -280,11 +352,26 @@
           and c.id=low_measured.compound_id
           and cas_no=#{casNo}
     </select>
+    <select id="selectByCasUltra" resultMap="DownloadMap">
+        SELECT c.id as id, c.compound_name as compound_name, c.synonym as synonym, c.cas_no as cas_no,
+               ot.id as ot_id, ot.odour_threshold as ot_odour_threshold, ot.odour_base as ot_odour_base,
+               od.id as od_id, od.odour_description as od_odour_description,
+               a1.name as threshold_article_name, a2.name as description_article_name
+        FROM compound c
+        LEFT JOIN odour_threshold ot on c.id = ot.compound_id
+        LEFT JOIN odour_description od on c.id = od.compound_id
+        LEFT JOIN article a1 on ot.article_id = a1.pk
+        LEFT JOIN article a2 on od.article_id = a2.pk
+        WHERE c.cas_no = #{cas}
+    </select>
     <update id="updateOne" parameterType="com.bjfu.li.odour.po.Compound">
         UPDATE `compound`
         SET compound_name = #{comp.compoundName}, synonym = #{comp.synonym}, cas_no = #{comp.casNo},
-            article = #{comp.article}, update_time = #{comp.updateTime}, reviewer = #{comp.reviewer},
-            is_deleted = #{comp.isDeleted}
+            chemical_structure = #{comp.chemicalStructure}, mass_spectrogram = #{comp.massSpectrogram},
+            mass_spectrogram_nist = #{comp.massSpectrogramNist},
+            update_time = #{comp.updateTime}, reviewer = #{comp.reviewer},
+            is_deleted = #{comp.isDeleted},
+            uploader = #{comp.uploader}, reviewer = #{comp.reviewer}
         WHERE id=#{comp.id}
     </update>
 </mapper>

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bjfu.li.odour.article.mapper.ArticleMapper;
 import com.bjfu.li.odour.article.po.Article;
+import com.bjfu.li.odour.base.mapper.BaseDao;
+import com.bjfu.li.odour.base.po.Base;
 import com.bjfu.li.odour.mapper.*;
 import com.bjfu.li.odour.po.*;
 import com.bjfu.li.odour.review.mapper.ReviewerMapper;
@@ -11,6 +13,8 @@ import com.bjfu.li.odour.service.ICompoundService;
 import com.bjfu.li.odour.utils.Base64Utils;
 import com.bjfu.li.odour.utils.PageResult;
 import com.bjfu.li.odour.utils.PageUtil;
+import com.bjfu.li.odour.vo.BasesVo;
+import com.bjfu.li.odour.vo.DownloadVo;
 import com.bjfu.li.odour.vo.SearchVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -68,15 +72,19 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     ArticleMapper articleMapper;
     @Resource
     ReviewerMapper reviewerMapper;
+    @Resource
+    OdourIntensityFunctionMapper functionMapper;
+    @Resource
+    BaseDao baseDao;
 
     @Value("${localImgPath}")
     String localImgPath;
     @Value("${networkImgPath}")
     String networkImgPath;
     @Override
-    public List<Compound> searchByCasPro(String cas){
+    public List<DownloadVo> searchByCasPro(String cas){
         cas=cas.replaceAll("-","");
-        return compoundMapper.selectByCasPro(cas);
+        return compoundMapper.selectByCasUltra(cas);
     }
     @Override
     public List<Compound> advancedSearch(Map<String, String> properties) {
@@ -87,13 +95,14 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
         String propertyDescription = searchVo.getSearchValue().toString().trim();
         String property = searchVo.getSearchProperty();
         List<Compound> compoundList;
+        PageHelper.startPage(searchVo.getPage(), searchVo.getSize());
         switch (property) {
             case "odour_description":
-                compoundList = compoundMapper.selectByOdourDescription(propertyDescription);
+                compoundList = compoundMapper.selectByOdourDescription(propertyDescription, searchVo.getSearchKind(), searchVo.getBase());
                 break;
             case "odour_threshold":
                 int odourThreshold= Integer.parseInt(propertyDescription);
-                compoundList = compoundMapper.selectByOdourThreshold(odourThreshold-10,odourThreshold+10);
+                compoundList = compoundMapper.selectByOdourThreshold(odourThreshold-10,odourThreshold+10, searchVo.getSearchKind(), searchVo.getBase());
                 break;
             case "compound_ri":
                 int ri= Integer.parseInt(propertyDescription);
@@ -118,11 +127,9 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 searchVo.setSearchRule("like");
                 searchVo.setSearchValue(propertyDescription);
                 searchVo.setSearchProperty(property);
-                List<SearchVo> searchVoList = new ArrayList<>();
-                searchVoList.add(searchVo);
-                compoundList = this.dynamicSelect(searchVoList);
+//                PageHelper.startPage(searchVo.getPage(), searchVo.getSize());
+                compoundList = this.dynamicSelect(searchVo);
         }
-        PageHelper.startPage(searchVo.getPage(), searchVo.getSize());
         PageInfo<Compound> pageInfo = new PageInfo<>(compoundList);
         return PageUtil.getPageResult(pageInfo);
     }
@@ -156,6 +163,15 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             for(OdourThreshold odourThreshold:compound.getOtList()){
                 odourThreshold.setCompoundId(compound.getId());
                 otMapper.insert(odourThreshold);
+                List<Base> baseList = baseDao.selectByName(odourThreshold.getOdourBase());
+                if(baseList.size() == 0) {
+                    Base base = new Base();
+                    base.setBase(odourThreshold.getOdourBase());
+                    base.setKind(1);
+                    baseDao.insert(base);
+                } else {
+                    baseDao.incrByOne(baseList.get(0).getId());
+                }
             }
             // RI
             for(Ri ri:compound.getRiList()){
@@ -177,6 +193,26 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             for(LowMeasured lowMeasured :compound.getLowmrList()){
                 lowMeasured.setCompoundId(compound.getId());
                 lowmeasuredMapper.insert(lowMeasured);
+            }
+            //强度函数
+            for(OdourIntensityFunction function : compound.getFunctionList()) {
+                String functionImg = function.getFunctionImg();
+                if(functionImg != null && !functionImg.equals("")) {
+                    functionImg = networkImgPath + "intensity function/" + Base64Utils.generateImage(functionImg, localImgPath+"intensity function");
+                    function.setFunctionImg(functionImg);
+                }
+                function.setCompoundId(compound.getId());
+                functionMapper.insert(function);
+
+                List<Base> baseList2 = baseDao.selectByName(function.getOdourBase());
+                if(baseList2.size() == 0) {
+                    Base base = new Base();
+                    base.setBase(function.getOdourBase());
+                    base.setKind(2);
+                    baseDao.insert(base);
+                } else {
+                    baseDao.incrByOne(baseList2.get(0).getId());
+                }
             }
             // 产品
             return insertProducts(compound);
@@ -272,6 +308,16 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             for(OdourThreshold odourThreshold:compound.getOtList()){
                 odourThreshold.setCompoundId(compound.getId());
                 otMapper.insert(odourThreshold);
+
+                List<Base> baseList = baseDao.selectByName(odourThreshold.getOdourBase());
+                if(baseList.size() == 0) {
+                    Base base = new Base();
+                    base.setBase(odourThreshold.getOdourBase());
+                    base.setKind(1);
+                    baseDao.insert(base);
+                } else {
+                    baseDao.incrByOne(baseList.get(0).getId());
+                }
             }
 
             // 更新odlist
@@ -297,6 +343,29 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             for(LowMeasured lowmeasured:compound.getLowmrList()){
                 lowmeasured.setCompoundId(compound.getId());
                 lowmeasuredMapper.insert(lowmeasured);
+            }
+
+            QueryWrapper<OdourIntensityFunction> oifQueryWrapper=new QueryWrapper<>();
+            oifQueryWrapper.eq("compound_id",compound.getId());
+            functionMapper.delete(oifQueryWrapper);
+            for(OdourIntensityFunction function:compound.getFunctionList()){
+                function.setCompoundId(compound.getId());
+                String functionImg = function.getFunctionImg();
+                if(functionImg != null && !functionImg.equals("") && functionImg.startsWith("data")) {
+                    functionImg = networkImgPath + "intensity function/" + Base64Utils.generateImage(functionImg, localImgPath+"intensity function");
+                    function.setFunctionImg(functionImg);
+                }
+                functionMapper.insert(function);
+
+                List<Base> baseList = baseDao.selectByName(function.getOdourBase());
+                if(baseList.size() == 0) {
+                    Base base = new Base();
+                    base.setBase(function.getOdourBase());
+                    base.setKind(2);
+                    baseDao.insert(base);
+                } else {
+                    baseDao.incrByOne(baseList.get(0).getId());
+                }
             }
             // 更新 product
             deleteProductInfo(compound);
@@ -408,6 +477,8 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
         compound.setOdList(odMapper.selectByCompoundId(id));
         // otList
         compound.setOtList(otMapper.selectByCompoundId(id));
+
+        compound.setFunctionList(functionMapper.selectByCompoundId(id));
         // riList
         QueryWrapper<Ri> riQueryWrapper=new QueryWrapper<>();
         riQueryWrapper.eq("compound_id", id);
@@ -444,17 +515,24 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     }
 
     @Override
-    public List<Compound> dynamicSelect(List<SearchVo> searchVoList) {
+    public List<Compound> dynamicSelect(SearchVo searchVo) {
         //为了测试连表和前后端字段名不一致，可省略
-        for (SearchVo searchVo : searchVoList) {
-            if (StringUtils.equalsIgnoreCase("id", searchVo.getSearchProperty())){
-                searchVo.setSearchProperty("compound.id");
-            }else if (StringUtils.equalsIgnoreCase("compound_name", searchVo.getSearchProperty())) {
-                searchVo.setSearchProperty("compound.compound_name");
-            }
+        if (StringUtils.equalsIgnoreCase("id", searchVo.getSearchProperty())){
+            searchVo.setSearchProperty("compound.id");
+        }else if (StringUtils.equalsIgnoreCase("compound_name", searchVo.getSearchProperty())) {
+            searchVo.setSearchProperty("compound.compound_name");
         }
-        return compoundMapper.dynamicSelect(searchVoList);
+        return compoundMapper.dynamicSelect(searchVo);
     }
+
+    @Override
+    public BasesVo getAllBase() {
+        BasesVo basesVo = new BasesVo();
+        basesVo.setThresholdBase(otMapper.getThresholdBase());
+        basesVo.setFunctionBase(otMapper.getFunctionBase());
+        return basesVo;
+    }
+
     @Override
     public List<Compound> getNews() {
         return compoundMapper.selectNewsList();

@@ -93,4 +93,16 @@ public class Compound implements Serializable {
      */
     @TableField(exist = false)
     private List<Product> productList;
+
+    @TableField(exist = false)
+    private List<OdourIntensityFunction> functionList;
+
+    @TableField(exist = false)
+    private String description;
+
+    @TableField(exist = false)
+    private String odourBase;
+
+    @TableField(exist = false)
+    private String odourThreshold;
 }
