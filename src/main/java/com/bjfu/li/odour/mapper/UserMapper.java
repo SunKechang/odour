@@ -3,10 +3,7 @@ package com.bjfu.li.odour.mapper;
 import com.bjfu.li.odour.form.UserRoleForm;
 import com.bjfu.li.odour.form.UserSearchForm;
 import com.bjfu.li.odour.po.User;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -27,6 +24,9 @@ public interface UserMapper {
     List<User> getUsers(@Param("form") UserSearchForm form);
 
     void setRole(@Param("form") UserRoleForm form);
+
+    @Update("UPDATE user SET userPassword = #{password} WHERE userEmail = #{email}")
+    void updateByEmail(@Param("email") String email, @Param("password") String password);
 
 }
 

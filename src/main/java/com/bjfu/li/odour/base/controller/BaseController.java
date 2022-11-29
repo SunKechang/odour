@@ -24,7 +24,6 @@ public class BaseController {
 
     @GetMapping("/all_available")
     public SverResponse<List<Base>> allAvailable() {
-        System.out.println("fjh");
         List<Base> res = baseService.selectAllAvailable();
         return SverResponse.createRespBySuccess(res);
     }

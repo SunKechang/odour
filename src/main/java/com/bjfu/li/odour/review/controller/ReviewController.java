@@ -60,6 +60,20 @@ public class ReviewController {
         return SverResponse.createRespBySuccess(pageInfo);
     }
 
+    @GetMapping("/get_all")
+    public SverResponse<PageInfo> getAll(HttpServletRequest request, @RequestParam int pageNum,
+                                              @RequestParam int pageSize) {
+        String token = request.getHeader("Authorization");
+        DecodedJWT verify= JWTUtils.verify(token);
+        String email = verify.getClaim("email").asString();
+        PageInfo pageInfo;
+        Page<Unreview> page = PageHelper.startPage(pageNum,pageSize);
+        List<Unreview> list = reviewService.getAll(email);
+        pageInfo = new PageInfo(list, 1);
+        PageHelper.clearPage();
+        return SverResponse.createRespBySuccess(pageInfo);
+    }
+
     @GetMapping("/get_committed")
     public SverResponse<PageInfo> getCommitted(HttpServletRequest request, @RequestParam int pageNum,
                                                      @RequestParam int pageSize) {
@@ -118,7 +132,9 @@ public class ReviewController {
     }
 
     @GetMapping("/get_reviewers")
-    public SverResponse<List<ReviewerVo>> getReviewers(@RequestParam String name) {
-        return SverResponse.createRespBySuccess(reviewService.getReviewers(name));
+    public SverResponse<List<ReviewerVo>> getReviewers(@RequestParam String name, HttpServletRequest request) {
+        String token= request.getHeader("Authorization");
+        DecodedJWT verify=JWTUtils.verify(token);
+        return SverResponse.createRespBySuccess(reviewService.getReviewers(name, verify.getClaim("email").asString()));
     }
 }

@@ -28,6 +28,9 @@ public class ExcelUtils {
                 Measured mr = new Measured();
                 XSSFCell measured = xssfRow.getCell(0);
                 XSSFCell relativeAbundance = xssfRow.getCell(1);
+                if(measured == null || relativeAbundance == null) {
+                    break;
+                }
                 mr.setMeasured(BigDecimal.valueOf(measured.getNumericCellValue()));
                 mr.setRelativeAbundance((int)Math.round(relativeAbundance.getNumericCellValue()));
                 mrList.add(mr);
@@ -48,6 +51,9 @@ public class ExcelUtils {
                 LowMeasured lmr = new LowMeasured();
                 XSSFCell measured = xssfRow.getCell(0);
                 XSSFCell relativeAbundance = xssfRow.getCell(1);
+                if(measured == null || relativeAbundance == null) {
+                    break;
+                }
                 lmr.setMeasured(BigDecimal.valueOf(measured.getNumericCellValue()));
                 lmr.setRelativeAbundance((int)Math.round(relativeAbundance.getNumericCellValue()));
                 lmrList.add(lmr);

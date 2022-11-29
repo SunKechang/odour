@@ -1,25 +1,39 @@
 package com.bjfu.li.odour.service.impl;
 
 import com.bjfu.li.odour.common.token.JWTUtils;
+import com.bjfu.li.odour.form.UserPassForm;
 import com.bjfu.li.odour.form.UserRoleForm;
 import com.bjfu.li.odour.form.UserSearchForm;
 import com.bjfu.li.odour.mapper.UserMapper;
 import com.bjfu.li.odour.po.User;
+import com.bjfu.li.odour.utils.MailUtils;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
 public class UserService {
     @Resource
     private UserMapper userMapper;
+
+    @Value("${spring.mail.username}")
+    private String sender;
+
+    Cache<String, String> localCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(5, TimeUnit.MINUTES).build();
 
     public String selectUserEmail(User user, HttpServletResponse response) {
         String userEmail = user.getUserEmail();
@@ -58,7 +72,6 @@ public class UserService {
         if(userMapper.selectUserEmail(userEmail) != null)
             return "0";
         String userPassword = user.getUserPassword();
-        System.out.println(userEmail + "***" + userPassword);
         String passwordMD5 = passwordMD5(userEmail, userPassword);
         userMapper.addUser(userEmail, passwordMD5, user.getName());
         return "1";
@@ -106,4 +119,43 @@ public class UserService {
     public void setRole(UserRoleForm form) {
         userMapper.setRole(form);
     }
+
+    /**
+     * 发送验证码到指定邮箱
+     *
+     * @param mailSender spring自带
+     * @param receiver   接受地址
+     */
+    public void sendEmail(JavaMailSenderImpl mailSender, String receiver) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setSubject("验证码");//设置邮件标题
+        String code = MailUtils.generateVerCode();
+        message.setText("尊敬的用户,您好:\n"
+                + "\n本次请求的邮件验证码为:" + code + ",本验证码5分钟内有效，请及时输入。（请勿泄露此验证码）\n"
+                + "\n如非本人操作，请忽略该邮件。\n(这是一封自动发送的邮件，请不要直接回复）");    //设置邮件正文
+        message.setFrom(sender);//发件人
+        message.setTo(receiver);//收件人
+        mailSender.send(message);//发送邮件
+
+        localCache.put(code, receiver);
+    }
+
+    /**
+     * 用户修改密码
+     */
+    public int updatePassword(UserPassForm form) {
+        String cacheCode = localCache.getIfPresent(form.getCode());
+        if(cacheCode == null) {
+            //验证码不存在或已过期
+            return -1;
+        }
+        if(!cacheCode.equals(form.getEmail())) {
+            //与发给本人的验证码不符
+            return 0;
+        }
+        String passwordMD5 = passwordMD5(form.getEmail(), form.getPassword());
+        userMapper.updateByEmail(form.getEmail(), passwordMD5);
+        return 1;
+    }
+
 }

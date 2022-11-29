@@ -16,6 +16,8 @@ public interface CompMapper extends BaseMapper<Compound> {
 
     List<Unreview> getReviewed(String email);
 
+    List<Unreview> getAll(String email);
+
     List<CommitVo> getCommitted(String email);
     List<CommitVo> getMyReviewed(String email);
 

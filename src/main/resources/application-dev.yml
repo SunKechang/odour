@@ -7,6 +7,14 @@ spring:
     username: root
     password: Pgone3123
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    username: kecsun@163.com
+    password: IIHSVMBMXJJSXRVE
+    host: smtp.163.com
+    properties:
+      mail:
+        smtp:
+          auth: true
 
 logging:
   level:

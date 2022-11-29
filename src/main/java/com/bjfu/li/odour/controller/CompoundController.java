@@ -198,6 +198,7 @@ public class CompoundController {
         out.flush();
         out.close();
         List<Measured> mrList= ExcelUtils.readXls(uploadPath);
+        System.out.println(mrList);
         assert  file.delete();
         return SverResponse.createRespBySuccess(mrList);
     }

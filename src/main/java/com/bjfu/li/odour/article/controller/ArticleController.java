@@ -32,6 +32,7 @@ public class ArticleController {
     @PostMapping("/add")
     public SverResponse<Integer> add(Article article){
         int pk = -1;
+        System.out.println("into" + article.getName());
         try {
             pk = articleService.add(article);
         } catch (IOException exception) {

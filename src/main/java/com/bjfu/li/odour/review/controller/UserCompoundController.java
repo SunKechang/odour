@@ -11,10 +11,7 @@ import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.po.Log;
 import com.bjfu.li.odour.service.ICompoundService;
 import com.bjfu.li.odour.service.impl.LogServiceImpl;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +54,23 @@ public class UserCompoundController {
         if(compoundService.save(compound)) {
             LogUploadReview log = new LogUploadReview();
             log.setOperation("ADD "+compound.getId());
+            log.setEmail(verify.getClaim("email").asString());
+            log.setIp(request.getRemoteAddr());
+            reviewService.insertLog(log);
+            return SverResponse.createRespBySuccess();
+        }else
+            return SverResponse.createRespByError();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public SverResponse<String> deleteCompound(
+            @PathVariable Integer id, HttpServletRequest request
+    ){
+        if(compoundService.delete(id)){
+            String token= request.getHeader("Authorization");
+            DecodedJWT verify=JWTUtils.verify(token);
+            LogUploadReview log = new LogUploadReview();
+            log.setOperation("DEL "+id);
             log.setEmail(verify.getClaim("email").asString());
             log.setIp(request.getRemoteAddr());
             reviewService.insertLog(log);

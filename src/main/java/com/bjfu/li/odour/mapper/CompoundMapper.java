@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.bjfu.li.odour.po.Compound;
 import com.bjfu.li.odour.vo.DownloadVo;
 import com.bjfu.li.odour.vo.SearchVo;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -33,4 +35,7 @@ public interface CompoundMapper extends BaseMapper<Compound> {
     List<Compound> selectByCasPro(String params);
     List<DownloadVo> selectByCasUltra(@Param("cas") String cas);
     void updateOne(@Param("comp") Compound compound);
+
+    @Update("UPDATE compound SET is_deleted=1 WHERE id=#{id}")
+    void deleteOne(@Param("id") Integer id);
 }

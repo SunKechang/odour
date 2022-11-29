@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ReviewerMapper extends BaseMapper<User> {
 
-    List<ReviewerVo> getReviewers(String name);
+    List<ReviewerVo> getReviewers(String name, String userEmail);
 
     @Select("select name from user where userEmail = #{email}")
     String getNameByEmail(@Param("email") String email);

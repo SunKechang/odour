@@ -11,5 +11,6 @@
         WHERE
             <bind name="searchName" value=" '%' + name + '%' "/>
             u.name like #{searchName}
+        AND u.role >= 2 AND u.userEmail != #{userEmail}
     </select>
 </mapper>

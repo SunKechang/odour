@@ -129,6 +129,7 @@
             <if test="searchVo.searchRule == 'like'">
                 AND ${searchVo.searchProperty} like concat("%", #{searchVo.searchValue}, "%")
             </if>
+            AND compound.is_deleted = 0
         </where>
         <if test="searchVo.searchKind != 0">
             HAVING base_num > 0
@@ -188,6 +189,9 @@
                  INNER JOIN
              (SELECT MAX(ot2.odour_threshold) as maxthreshold, ot2.compound_id as comp_id FROM odour_threshold ot2
               WHERE ot2.odour_threshold between #{low} and #{high}
+             <if test="kind == 1">
+                 AND ot2.odour_base = #{base}
+             </if>
               GROUP BY ot2.compound_id) as max_table
              ON ot.compound_id = max_table.comp_id
         LEFT JOIN compound ON ot.compound_id = compound.id

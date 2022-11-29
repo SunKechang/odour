@@ -61,14 +61,6 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
     @Resource
     LowMeasuredMapper lowmeasuredMapper;
     @Resource
-    ProductKeyMapper productKeyMapper;
-    @Resource
-    ProductMapper productMapper;
-    @Resource
-    ProductOdourThresholdMapper productOtMapper;
-    @Resource
-    ProductOdourDescriptionMapper productOdMapper;
-    @Resource
     ArticleMapper articleMapper;
     @Resource
     ReviewerMapper reviewerMapper;
@@ -215,37 +207,15 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 }
             }
             // 产品
-            return insertProducts(compound);
+//            return insertProducts(compound);
+            return true;
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
     }
 
-    private boolean insertProducts(Compound compound) {
-        if (compound.getProductList().size() != 0) {
-            for (Product product:compound.getProductList()) {
-                // Product 和 Compound 对应关系
-                ProductKey productKey = new ProductKey();
-                productKey.setProductId(product.getId());
-                productKey.setCompoundId(compound.getId());
-                // Product 风味阈值
-                List<ProductOdourThreshold> productOtList = product.getOtList();
-                for (ProductOdourThreshold productOt: productOtList) {
-                    productOt.setCompoundId(compound.getId());
-                    productOtMapper.insert(productOt);
-                }
-                List<ProductOdourDescription> productOdList = product.getOdList();
-                for (ProductOdourDescription productOd: productOdList) {
-                    productOd.setCompoundId(compound.getId());
-                    productOdMapper.insert(productOd);
-                }
-                // Product 风味描述
-                productKeyMapper.insert(productKey);
-            }
-        }
-        return true;
-    }
+
 
     @Override
     public boolean update(Compound compound) {
@@ -368,24 +338,13 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
                 }
             }
             // 更新 product
-            deleteProductInfo(compound);
-            return insertProducts(compound);
+//            deleteProductInfo(compound);
+//            return insertProducts(compound);
+            return true;
         }catch (Exception e){
             e.printStackTrace();
             return false;
         }
-    }
-
-    private void deleteProductInfo(Compound compound) {
-        QueryWrapper<ProductKey> keyQueryWrapper=new QueryWrapper<>();
-        keyQueryWrapper.eq("compound_id",compound.getId());
-        productKeyMapper.delete(keyQueryWrapper);
-        QueryWrapper<ProductOdourDescription> productOdQueryWrapper=new QueryWrapper<>();
-        productOdQueryWrapper.eq("compound_id",compound.getId());
-        productOdMapper.delete(productOdQueryWrapper);
-        QueryWrapper<ProductOdourThreshold> productOtQueryWrapper=new QueryWrapper<>();
-        productOtQueryWrapper.eq("compound_id",compound.getId());
-        productOtMapper.delete(productOtQueryWrapper);
     }
 
     private void delMassSpectrogramNist(Compound _compound) {
@@ -422,7 +381,7 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
 
 
     public boolean delete(Integer id){
-        Compound compound=compoundMapper.selectById(id);
+        Compound compound=compoundMapper.selectOne(id);
         try {
             delChemicalStructure(compound);
             delMassSpectrogram(compound);
@@ -451,9 +410,9 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
             QueryWrapper<OdourThreshold> otQueryWrapper=new QueryWrapper<>();
             otQueryWrapper.eq("compound_id",id);
             otMapper.delete(otQueryWrapper);
-            compoundMapper.deleteById(id);
+            compoundMapper.deleteOne(id);
 
-            deleteProductInfo(compound);
+//            deleteProductInfo(compound);
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -498,17 +457,6 @@ public class CompoundServiceImpl extends ServiceImpl<CompoundMapper, Compound> i
         // productList
         QueryWrapper<ProductKey> keyQueryWrapper = new QueryWrapper<>();
         keyQueryWrapper.eq("compound_id", id);
-        List<ProductKey> productKeyList = productKeyMapper.selectList(keyQueryWrapper);
-        List<Product> productList = new ArrayList<>();
-        for (ProductKey productKey: productKeyList) {
-            Product product;
-            Integer productId = productKey.getProductId();
-            product = productMapper.selectById(productId);
-            product.setOdList(productOdMapper.selectByCompoundId(id, productId));
-            product.setOtList(productOtMapper.selectByCompoundId(id, productId));
-            productList.add(product);
-        }
-        compound.setProductList(productList);
         String reviewerName = reviewerMapper.getNameByEmail(compound.getReviewer());
         compound.setReviewerName(reviewerName);
         return compound;

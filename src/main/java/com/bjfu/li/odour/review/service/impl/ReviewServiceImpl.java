@@ -38,6 +38,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public List<Unreview> getAll(String email) {
+        return compMapper.getAll(email);
+    }
+
+    @Override
     public List<CommitVo> getCommitted(String email) {
         return compMapper.getCommitted(email);
     }
@@ -71,7 +76,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewerVo> getReviewers(String name) {
-        return reviewerMapper.getReviewers(name);
+    public List<ReviewerVo> getReviewers(String name, String userName) {
+        return reviewerMapper.getReviewers(name, userName);
     }
 }

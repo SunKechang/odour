@@ -15,6 +15,8 @@ public interface ReviewService {
 
     List<Unreview> getReviewed(String email);
 
+    List<Unreview> getAll(String email);
+
     List<CommitVo> getCommitted(String email);
 
     List<CommitVo> getMyReviewed(String email);
@@ -25,5 +27,5 @@ public interface ReviewService {
 
     List<ReviewVo> getApprovalList(int comId);
 
-    List<ReviewerVo> getReviewers(String name);
+    List<ReviewerVo> getReviewers(String name, String userName);
 }

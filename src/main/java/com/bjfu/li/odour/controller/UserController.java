@@ -1,6 +1,8 @@
 package com.bjfu.li.odour.controller;
 
 import com.bjfu.li.odour.common.pojo.SverResponse;
+import com.bjfu.li.odour.form.RegisterForm;
+import com.bjfu.li.odour.form.UserPassForm;
 import com.bjfu.li.odour.form.UserRoleForm;
 import com.bjfu.li.odour.form.UserSearchForm;
 import com.bjfu.li.odour.po.User;
@@ -9,9 +11,12 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Email;
 import java.util.List;
 
 @RestController
@@ -20,18 +25,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @ResponseBody
-//    @RequestMapping(value = "/register", method = RequestMethod.POST)
-//    public String register(@RequestBody User user) {
-//        return userService.addUser(user);
-//    }
+    @Autowired
+    private JavaMailSenderImpl mailSender;
+
     @PostMapping("/register")
-    public String register(@RequestParam String userEmail,
-                           @RequestParam String userPassword, @RequestParam String name) {
+    public String register(@RequestBody @Validated RegisterForm form) {
         User user = new User();
-        user.setUserEmail(userEmail);
-        user.setUserPassword(userPassword);
-        user.setName(name);
+        user.setUserEmail(form.getUserEmail());
+        user.setUserPassword(form.getUserPassword());
+        user.setName(form.getName());
         return userService.addUser(user);
     }
 
@@ -70,8 +72,21 @@ public class UserController {
     }
 
     @PostMapping("set_role")
-    public SverResponse<String> setRole(@RequestBody UserRoleForm form) {
+    public SverResponse<String> setRole(@RequestBody @Validated UserRoleForm form) {
         userService.setRole(form);
         return SverResponse.createRespBySuccess();
+    }
+
+    @PostMapping("send_email/{email}")
+    public SverResponse<String> sendEmail(@PathVariable String email) {
+        System.out.println(email);
+        userService.sendEmail(mailSender, email);
+        return SverResponse.createRespBySuccess();
+    }
+
+    @PostMapping("/update/password")
+    public SverResponse<Integer> updatePassword(@RequestBody UserPassForm form) {
+        int res = userService.updatePassword(form);
+        return SverResponse.createRespBySuccess(res);
     }
 }

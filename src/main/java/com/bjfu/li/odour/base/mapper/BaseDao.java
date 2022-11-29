@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface BaseDao extends BaseMapper<Base> {
 
-    @Select("SELECT * FROM base WHERE img_path IS NOT NULL ORDER BY importance DESC")
+    @Select("SELECT * FROM base WHERE img_path IS NOT NULL AND kind=1 ORDER BY importance DESC")
     List<Base> selectAllAvailable();
 
     @Select("SELECT * FROM base")

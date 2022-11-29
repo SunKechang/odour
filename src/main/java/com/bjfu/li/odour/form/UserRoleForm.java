@@ -12,6 +12,6 @@ public class UserRoleForm {
     @NotBlank
     private String email;
 
-    @Range(min = 0, max = 2)
+    @Range(min = 0, max = 3)
     private int role;
 }
